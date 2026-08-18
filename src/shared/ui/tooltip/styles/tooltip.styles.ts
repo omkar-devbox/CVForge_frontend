@@ -13,16 +13,16 @@ export const tooltipVariants: Record<
   { panel: string; arrow: string }
 > = {
   dark: {
-    panel: "bg-neutral-900 text-white dark:bg-neutral-800",
-    arrow: "fill-neutral-900 dark:fill-neutral-800",
+    panel: "bg-[#004066] text-[#ebf7ff]",
+    arrow: "fill-[#004066]",
   },
   light: {
-    panel: "bg-white text-neutral-900 border border-neutral-200 shadow-lg",
-    arrow: "fill-white [&>path]:stroke-neutral-200",
+    panel: "bg-white text-[#004066] border border-[#004066]/15 shadow-lg",
+    arrow: "fill-white [&>path]:stroke-[#004066]/15",
   },
   primary: {
-    panel: "bg-primary text-primary-foreground",
-    arrow: "fill-primary",
+    panel: "bg-[#0077be] text-white font-medium",
+    arrow: "fill-[#0077be]",
   },
   success: {
     panel: "bg-emerald-600 text-white",
@@ -33,12 +33,12 @@ export const tooltipVariants: Record<
     arrow: "fill-amber-500",
   },
   danger: {
-    panel: "bg-destructive text-destructive-foreground",
-    arrow: "fill-destructive",
+    panel: "bg-rose-600 text-white",
+    arrow: "fill-rose-600",
   },
   info: {
-    panel: "bg-sky-500 text-white",
-    arrow: "fill-sky-500",
+    panel: "bg-[#0077be] text-white",
+    arrow: "fill-[#0077be]",
   },
 };
 

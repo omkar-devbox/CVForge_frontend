@@ -80,17 +80,17 @@ export const ExcelDashboard: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-12">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden">
-        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#004066] via-[#00304d] to-[#004066] text-white p-6 md:p-8 rounded-3xl shadow-xl border border-[#004066]/30 relative overflow-hidden">
+        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-[#0077be]/20 rounded-full blur-3xl pointer-events-none" />
         <div className="z-10">
-          <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+          <div className="flex items-center gap-2 text-[#38bdf8] text-xs font-bold uppercase tracking-wider mb-2">
             <Sparkles className="h-4 w-4" />
             FastAPI + openpyxl Deep Parser & LLM Modifier
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
             Excel & CSV Intelligence Portal
           </h1>
-          <p className="text-sm text-slate-300 max-w-2xl mt-1 leading-relaxed">
+          <p className="text-sm text-[#ebf7ff]/80 max-w-2xl mt-1 leading-relaxed">
             Upload spreadsheets to extract detailed openpyxl structural metadata, auto-detect data headers, preview rows, and apply natural language modifications with instant live preview updates.
           </p>
         </div>
@@ -100,7 +100,7 @@ export const ExcelDashboard: React.FC = () => {
             <button
               onClick={() => selectedFile && handleFileSelect(selectedFile, false)}
               disabled={isAnalyzing}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white backdrop-blur transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0077be]/40 hover:bg-[#0077be]/60 text-white border border-[#0077be]/30 backdrop-blur transition-all shadow-sm"
             >
               <RefreshCw className={`h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
               Re-analyze
@@ -121,13 +121,13 @@ export const ExcelDashboard: React.FC = () => {
 
       {/* Analysis Loading Indicator */}
       {isAnalyzing && (
-        <div className="p-8 rounded-2xl border border-blue-500/20 bg-blue-500/5 dark:bg-blue-950/20 flex flex-col items-center justify-center gap-3 text-center animate-pulse">
-          <Loader2 className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-spin" />
+        <div className="p-8 rounded-2xl border border-[#0077be]/30 bg-[#ebf7ff]/70 dark:bg-[#0077be]/10 flex flex-col items-center justify-center gap-3 text-center animate-pulse shadow-sm">
+          <Loader2 className="h-8 w-8 text-[#0077be] dark:text-[#38bdf8] animate-spin" />
           <div>
-            <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+            <h4 className="font-bold text-[#004066] dark:text-[#ebf7ff] text-sm">
               Analyzing & Updating Live Preview...
             </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 mt-0.5">
               Extracting openpyxl cell formulas, merged ranges, styles, header index & Pandas preview
             </p>
           </div>
@@ -158,15 +158,15 @@ export const ExcelDashboard: React.FC = () => {
           liveUpdateInfo={liveUpdateInfo}
         />
       ) : !isAnalyzing && (
-        <div className="p-12 text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 flex flex-col items-center justify-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+        <div className="p-12 text-center rounded-2xl border border-dashed border-[#004066]/20 dark:border-[#004066]/40 bg-white/70 dark:bg-[#061a29]/60 flex flex-col items-center justify-center gap-3 shadow-xs">
+          <div className="h-12 w-12 rounded-2xl bg-[#ebf7ff] dark:bg-[#041829] flex items-center justify-center text-[#0077be]">
             <FileSpreadsheet className="h-6 w-6" />
           </div>
           <div>
-            <h4 className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
+            <h4 className="font-bold text-[#004066] dark:text-[#ebf7ff] text-sm">
               No Spreadsheet Loaded Yet
             </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mt-1">
+            <p className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 max-w-md mt-1">
               Upload an Excel (.xlsx, .xlsm) or CSV file above to inspect worksheet formulas, merged cells, protection settings, header row auto-detection, and data preview.
             </p>
           </div>

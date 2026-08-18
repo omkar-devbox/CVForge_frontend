@@ -134,7 +134,7 @@ src/shared/nav/Sidebar/
 | `defaultWidth` | `number` | `256` | No | Width of sidebar in pixels when expanded (if no saved width in localStorage). |
 | `minWidth` | `number` | `200` | No | Minimum allowed width in pixels when resizing. |
 | `maxWidth` | `number` | `480` | No | Maximum allowed width in pixels when resizing. |
-| `storageKey` | `string` | `"passionnova..."` | No | LocalStorage key name used to save user's custom width. Set to `""` to disable persistence. |
+| `storageKey` | `string` | `"system_mechatronics_sidebar_width"` | No | LocalStorage key name used to save user's custom width. Set to `""` to disable persistence. |
 | `onWidthChange` | `(w: number) => void` | `undefined` | No | Listener callback fired whenever user resizes the sidebar. |
 | `menu` | `MenuSection[]` | Default Menu | No | Array of sections and items to display in sidebar. |
 | `side` | `"left" \| "right"` | `"left"` | No | Sets sidebar placement on left or right side of screen. |
@@ -387,7 +387,7 @@ export const MY_APP_MENU: MenuSection[] = [
 - **How to Resize**: Mouse-down on the right border of the sidebar and drag left/right.
 - **Keyboard Control**: Focus the handle using `Tab` key, then press `ArrowLeft` or `ArrowRight` to adjust width by 10px. Press `Home` for min width, `End` for max width, or `Enter`/`Space` to reset.
 - **Double Click**: Double-click the resize handle to instantly reset to default width (`256px`).
-- **Persistence**: Saved automatically into browser `localStorage` under `passionnova_technologis_sidebar_width`.
+- **Persistence**: Saved automatically into browser `localStorage` under `system_mechatronics_sidebar_width`.
 
 ---
 
@@ -626,4 +626,4 @@ export function CustomComposedSidebar() {
 > **Answer**: Pass `defaultWidth={300}` (or any pixel numeric value).
 
 ### Q5: How do I clear saved sidebar width in localStorage?
-> **Answer**: Pass `storageKey=""` to disable reading/writing to localStorage, or clear the storage key `"passionnova_technologis_sidebar_width"` in browser developer tools.
+> **Answer**: Pass `storageKey=""` to disable reading/writing to localStorage, or clear the storage key `"system_mechatronics_sidebar_width"` in browser developer tools.

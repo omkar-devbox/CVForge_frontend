@@ -1,8 +1,7 @@
-import { type FC, memo } from "react";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { type FC, memo, useState, useEffect, useRef } from "react";
+import { LogOut, User as UserIcon, Shield } from "lucide-react";
 import { Tooltip } from "@/shared/ui";
 import { footerStyles } from "../styles/sidebar.styles";
-import { cn } from "../../../lib/utils";
 import type { SidebarFooterProps } from "../types/types";
 
 export const SidebarFooter: FC<SidebarFooterProps> = memo(({
@@ -11,7 +10,43 @@ export const SidebarFooter: FC<SidebarFooterProps> = memo(({
   user,
   side = "left",
 }) => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const tooltipPlacement = side === "left" ? "right" : "left";
+
+  const roleDisplay =
+    user?.roles && user.roles.length > 0
+      ? user.roles.join(", ")
+      : user?.role || "";
+
+  useEffect(() => {
+    if (!isProfileOpen) return;
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isProfileOpen]);
 
   const userAvatarNode = (
     <div className={footerStyles.avatar}>
@@ -28,29 +63,72 @@ export const SidebarFooter: FC<SidebarFooterProps> = memo(({
     </div>
   );
 
-  const logoutBtnNode = (
-    <button
-      type="button"
-      onClick={onLogout}
-      aria-label="Logout"
-      className={cn(
-        footerStyles.logoutButton(collapsed),
-        !collapsed && side === "right" && "flex-row-reverse",
-      )}
-    >
-      <LogOut size={20} className={footerStyles.logoutIcon(collapsed)} />
-      {!collapsed && <span className="text-[14px] font-medium">Logout</span>}
-    </button>
-  );
-
   return (
-    <div className={footerStyles.container(collapsed)}>
+    <div ref={containerRef} className={footerStyles.container(collapsed)}>
+      {/* Profile Popup Menu */}
+      {isProfileOpen && user && (
+        <div className={footerStyles.popupMenu(collapsed, side)}>
+          <div className={footerStyles.popupHeader}>
+            <p className={footerStyles.popupName}>{user.name}</p>
+            <p className={footerStyles.popupEmail}>{user.email}</p>
+            {roleDisplay && (
+              <span className={footerStyles.popupRoleBadge}>
+                <Shield size={10} />
+                {roleDisplay}
+              </span>
+            )}
+          </div>
+
+          <div className={footerStyles.popupItemGroup}>
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(false)}
+              className={footerStyles.popupItem}
+            >
+              <UserIcon size={15} className="text-slate-400" />
+              My Profile
+            </button>
+          </div>
+
+          <div className={footerStyles.popupLogoutDivider}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsProfileOpen(false);
+                onLogout();
+              }}
+              className={footerStyles.popupLogoutItem}
+            >
+              <LogOut size={15} className="text-red-500" />
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
+
       {user && (
-        <div className={footerStyles.userArea(collapsed, side)}>
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="User Profile"
+          aria-expanded={isProfileOpen}
+          onClick={() => setIsProfileOpen((prev) => !prev)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setIsProfileOpen((prev) => !prev);
+            }
+          }}
+          className={footerStyles.userArea(collapsed, side)}
+        >
           {collapsed ? (
-            <Tooltip content={user.name} placement={tooltipPlacement} offset={16}>
-              {userAvatarNode}
-            </Tooltip>
+            !isProfileOpen ? (
+              <Tooltip content={user.name} placement={tooltipPlacement} offset={16}>
+                {userAvatarNode}
+              </Tooltip>
+            ) : (
+              userAvatarNode
+            )
           ) : (
             userAvatarNode
           )}
@@ -69,16 +147,6 @@ export const SidebarFooter: FC<SidebarFooterProps> = memo(({
           )}
         </div>
       )}
-
-      <div className="flex flex-col gap-1 items-center w-full">
-        {collapsed ? (
-          <Tooltip content="Logout" placement={tooltipPlacement} offset={16}>
-            {logoutBtnNode}
-          </Tooltip>
-        ) : (
-          logoutBtnNode
-        )}
-      </div>
     </div>
   );
 });

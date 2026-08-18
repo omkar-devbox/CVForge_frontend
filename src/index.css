@@ -3,15 +3,43 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  --color-dominant: #ebf7ff;
+  --color-dominant-subtle: #f4faff;
+  --color-dominant-dark: #03131e;
+  --color-dominant-dark-surface: #061a29;
+
+  --color-secondary: #004066;
+  --color-secondary-hover: #00304d;
+  --color-secondary-light: #00598e;
+  --color-secondary-dark: #002237;
+
+  --color-accent: #0077be;
+  --color-accent-hover: #00639e;
+  --color-accent-active: #004f7e;
+  --color-accent-subtle: rgba(0, 119, 190, 0.12);
+
+  --color-brand-primary: #0077be;
+  --color-brand-secondary: #004066;
+  --color-brand-dominant: #ebf7ff;
+
   --font-sans: "Aptos", "Aptos Display", "Plus Jakarta Sans", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: "Aptos Display", "Aptos", "Outfit", "Plus Jakarta Sans", sans-serif;
+  --font-serif: "Times New Roman", Times, Georgia, Cambria, serif;
 }
 
 @layer base {
 
   html,
   body {
+    background-color: var(--color-dominant);
+    color: var(--color-secondary);
     transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html.dark,
+  html.dark body {
+    background-color: var(--color-dominant-dark);
+    color: var(--color-dominant);
   }
 
   body {
@@ -19,6 +47,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: #0077be;
+    color: #ffffff;
   }
 
   /* Crisp high-resolution image rendering for clear images, avatars, logos & icons */
@@ -29,7 +62,6 @@
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
-
 
   /* Global ultra-thin scrollbar */
   ::-webkit-scrollbar {
@@ -42,12 +74,16 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: rgba(148, 163, 184, 0.35);
+    background-color: rgba(0, 64, 102, 0.25);
     border-radius: 9999px;
   }
 
+  html.dark ::-webkit-scrollbar-thumb {
+    background-color: rgba(235, 247, 255, 0.2);
+  }
+
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(99, 102, 241, 0.6);
+    background-color: #0077be;
   }
 }
 

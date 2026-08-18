@@ -10,25 +10,25 @@ export type BadgeSize = 'sm' | 'md' | 'lg';
 
 export const badgeVariantStyles: Record<BadgeVariant, string> = {
   default:
-    'bg-neutral-border text-text-primary dark:bg-neutral-bg dark:text-text-primary',
+    'bg-[#004066]/10 text-[#004066] dark:bg-[#004066]/30 dark:text-[#ebf7ff]',
   success:
-    'bg-success-light text-success dark:bg-success/20 dark:text-success-light',
+    'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400',
   danger:
-    'bg-error-bg text-error dark:bg-error/20 dark:text-error-bg',
+    'bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400',
   warning:
-    'bg-warning-light text-warning dark:bg-warning/20 dark:text-warning-light',
+    'bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400',
   info:
-    'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary/90',
+    'bg-[#0077be]/10 text-[#0077be] dark:bg-[#0077be]/25 dark:text-[#38bdf8]',
 };
 
 /* ── Dot colours ───────────────────────────────────────────── */
 
 export const badgeDotColors: Record<BadgeVariant, string> = {
-  default: 'bg-neutral-border',
-  success: 'bg-success',
-  danger:  'bg-error',
-  warning: 'bg-warning',
-  info:    'bg-primary',
+  default: 'bg-[#004066] dark:bg-[#ebf7ff]',
+  success: 'bg-emerald-500',
+  danger:  'bg-rose-500',
+  warning: 'bg-amber-500',
+  info:    'bg-[#0077be]',
 };
 
 /* ── Dot sizes ─────────────────────────────────────────────── */

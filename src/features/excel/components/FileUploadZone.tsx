@@ -124,27 +124,27 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
           onClick={() => inputRef.current?.click()}
           className={`relative cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300 ${
             isDragging
-              ? "border-blue-500 bg-blue-500/10 scale-[0.99]"
-              : "border-slate-300 dark:border-slate-700/70 bg-white/50 dark:bg-slate-900/40 hover:border-blue-400 dark:hover:border-blue-500/60 hover:bg-blue-50/50 dark:hover:bg-slate-800/50 shadow-sm hover:shadow"
+              ? "border-[#0077be] bg-[#0077be]/10 scale-[0.99]"
+              : "border-[#004066]/20 dark:border-[#004066]/40 bg-white/80 dark:bg-[#061a29]/80 hover:border-[#0077be] dark:hover:border-[#0077be] hover:bg-[#ebf7ff]/70 dark:hover:bg-[#004066]/20 shadow-sm hover:shadow"
           }`}
         >
           <div className="flex flex-col items-center justify-center gap-3">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-blue-600/10 via-indigo-600/10 to-violet-600/10 dark:from-blue-500/20 dark:to-violet-500/20 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+            <div className="h-14 w-14 rounded-2xl bg-[#0077be]/10 dark:bg-[#0077be]/20 border border-[#0077be]/20 flex items-center justify-center text-[#0077be] dark:text-[#38bdf8] group-hover:scale-110 transition-transform">
               <Upload className="h-7 w-7" />
             </div>
 
             <div>
-              <p className="text-base font-semibold text-slate-800 dark:text-slate-200">
+              <p className="text-base font-bold text-[#004066] dark:text-[#ebf7ff]">
                 Drag & drop your Excel or CSV spreadsheet here
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Supports <span className="font-semibold text-slate-700 dark:text-slate-300">.xlsx, .xlsm, .csv, .xls</span> up to 50MB
+              <p className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 mt-1">
+                Supports <span className="font-semibold text-[#004066] dark:text-[#ebf7ff]">.xlsx, .xlsm, .csv, .xls</span> up to 50MB
               </p>
             </div>
 
             <button
               type="button"
-              className="mt-1 inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-sm shadow-blue-500/20 transition-all active:scale-95"
+              className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold rounded-xl text-white bg-[#0077be] hover:bg-[#00639e] shadow-sm shadow-[#0077be]/25 transition-all active:scale-95 cursor-pointer"
             >
               <FileSpreadsheet className="h-4 w-4" />
               Browse Spreadsheet

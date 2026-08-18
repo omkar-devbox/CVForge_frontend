@@ -2,15 +2,15 @@ import type { ModalStyleConfig } from "../types/modal.types";
 
 export const defaultModalStyleConfig: ModalStyleConfig = {
   overlay: {
-    bg: "bg-gray-900/40 dark:bg-black/60",
+    bg: "bg-[#004066]/40 dark:bg-black/70",
     blur: "backdrop-blur-[2px]",
     zIndex: 50,
   },
   panel: {
-    bg: "bg-white dark:bg-slate-900",
+    bg: "bg-white dark:bg-[#061a29]",
     rounded: "rounded-3xl",
     shadow: "shadow-2xl",
-    border: "border border-slate-200 dark:border-slate-800",
+    border: "border border-[#004066]/15 dark:border-[#004066]/40",
     maxWidths: {
       sm: "max-w-sm",
       md: "max-w-md",
@@ -25,25 +25,25 @@ export const defaultModalStyleConfig: ModalStyleConfig = {
     },
   },
   header: {
-    bg: "bg-white dark:bg-slate-900",
-    border: "border-b border-slate-200 dark:border-slate-800",
+    bg: "bg-white dark:bg-[#061a29]",
+    border: "border-b border-[#004066]/10 dark:border-[#004066]/40",
     padding: "px-6 py-4",
-    titleSize: "text-lg font-semibold",
-    titleColor: "text-slate-900 dark:text-slate-100",
+    titleSize: "text-lg font-bold",
+    titleColor: "text-[#004066] dark:text-[#ebf7ff]",
     descSize: "text-sm font-normal",
-    descColor: "text-slate-500 dark:text-slate-400",
-    closeBtnColor: "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200",
-    closeBtnHoverBg: "hover:bg-slate-100 dark:hover:bg-slate-800",
+    descColor: "text-[#004066]/70 dark:text-[#ebf7ff]/70",
+    closeBtnColor: "text-[#004066]/50 hover:text-[#004066] dark:hover:text-[#ebf7ff]",
+    closeBtnHoverBg: "hover:bg-[#ebf7ff] dark:hover:bg-[#004066]/40",
   },
   body: {
-    bg: "bg-white dark:bg-slate-900",
+    bg: "bg-white dark:bg-[#061a29]",
     padding: "px-6 py-4",
-    textColor: "text-slate-800 dark:text-slate-200",
+    textColor: "text-[#004066] dark:text-[#ebf7ff]",
     maxHeight: "max-h-[70vh]",
   },
   footer: {
-    bg: "bg-slate-50/80 dark:bg-slate-900/80",
-    border: "border-t border-slate-200 dark:border-slate-800",
+    bg: "bg-[#ebf7ff]/60 dark:bg-[#041829]/70",
+    border: "border-t border-[#004066]/10 dark:border-[#004066]/40",
     padding: "px-6 py-4",
   },
 };

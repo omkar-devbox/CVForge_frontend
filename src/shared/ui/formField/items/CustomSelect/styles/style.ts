@@ -6,15 +6,15 @@
 export const selectStyles = {
   /** Main control container */
   control:
-    "flex w-full items-center min-h-[42px] justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 px-3.5 py-2.5 text-sm font-normal text-slate-900 dark:text-slate-100 transition-all duration-200 cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 focus-within:border-blue-500 dark:focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:outline-none shadow-2xs",
+    "flex w-full items-center min-h-[42px] justify-between rounded-xl border border-[#004066]/20 dark:border-[#004066]/40 bg-white dark:bg-[#061a29]/80 px-3.5 py-2.5 text-sm font-normal text-[#004066] dark:text-[#ebf7ff] transition-all duration-200 cursor-pointer hover:border-[#004066]/40 dark:hover:border-[#004066]/60 focus-within:border-[#0077be] dark:focus-within:border-[#0077be] focus-within:ring-4 focus-within:ring-[#0077be]/15 focus-within:outline-none shadow-2xs",
 
   /** Disabled state for control */
   disabled:
-    "cursor-not-allowed bg-slate-50 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 opacity-75 border-slate-200 dark:border-slate-800 pr-10",
+    "cursor-not-allowed bg-[#ebf7ff]/40 dark:bg-[#041829]/60 text-[#004066]/40 dark:text-[#ebf7ff]/40 opacity-75 border-[#004066]/10 dark:border-[#004066]/20 pr-10",
 
   /** Error state for control */
   error:
-    "!border-rose-500 focus-within:!border-rose-500 focus-within:!ring-rose-500/10 bg-white dark:bg-slate-900/60",
+    "!border-rose-500 focus-within:!border-rose-500 focus-within:!ring-rose-500/10 bg-white dark:bg-[#061a29]/80",
 
   /** Inner content area */
   contentArea:
@@ -22,35 +22,35 @@ export const selectStyles = {
 
   /** Multi-select badge */
   badge:
-    "flex items-center gap-1 rounded-lg tracking-wide bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/50 px-2 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400 shrink-0",
-  badgeIcon: "h-3 w-3 cursor-pointer hover:opacity-70 text-blue-600 dark:text-blue-400",
+    "flex items-center gap-1 rounded-lg tracking-wide bg-[#0077be]/10 dark:bg-[#0077be]/25 border border-[#0077be]/20 px-2 py-0.5 text-xs font-medium text-[#0077be] dark:text-[#38bdf8] shrink-0",
+  badgeIcon: "h-3 w-3 cursor-pointer hover:opacity-70 text-[#0077be] dark:text-[#38bdf8]",
 
   /** Selected label (single select) */
   selectedLabel:
-    "flex-1 truncate text-sm font-normal text-slate-900 dark:text-slate-100 leading-5 pointer-events-none",
+    "flex-1 truncate text-sm font-normal text-[#004066] dark:text-[#ebf7ff] leading-5 pointer-events-none",
 
   /** Placeholder */
   placeholder:
-    "absolute inset-y-0 left-0 flex items-center text-sm font-normal text-slate-400 dark:text-slate-500 leading-5 pointer-events-none truncate max-w-full",
+    "absolute inset-y-0 left-0 flex items-center text-sm font-normal text-[#004066]/40 dark:text-[#ebf7ff]/40 leading-5 pointer-events-none truncate max-w-full",
 
   /** Search input */
   input:
-    "bg-transparent outline-none p-0 text-slate-900 dark:text-slate-100 text-sm leading-5 min-w-0 placeholder:text-slate-400",
+    "bg-transparent outline-none p-0 text-[#004066] dark:text-[#ebf7ff] text-sm leading-5 min-w-0 placeholder:text-[#004066]/40",
 
   /** Right indicators container */
-  indicators: "flex items-center gap-1.5 ml-2 text-slate-400 dark:text-slate-500 shrink-0",
+  indicators: "flex items-center gap-1.5 ml-2 text-[#004066]/50 dark:text-[#ebf7ff]/50 shrink-0",
 
   /** Dropdown menu */
-  menu: "absolute z-[9999] left-0 mt-1.5 max-h-60 w-full overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 shadow-xl shadow-slate-900/10 focus:outline-none backdrop-blur-md",
+  menu: "absolute z-[9999] left-0 mt-1.5 max-h-60 w-full overflow-y-auto rounded-xl border border-[#004066]/15 dark:border-[#004066]/40 bg-white dark:bg-[#061a29] p-1.5 shadow-xl shadow-[#004066]/10 focus:outline-none backdrop-blur-md",
 
   /** Individual option */
   option:
     "flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-  optionSelected: "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold",
+  optionSelected: "bg-[#0077be]/10 dark:bg-[#0077be]/25 text-[#0077be] dark:text-[#38bdf8] font-semibold",
   optionHighlighted:
-    "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100",
-  optionDefault: "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100",
+    "bg-[#ebf7ff] dark:bg-[#004066]/40 text-[#004066] dark:text-[#ebf7ff]",
+  optionDefault: "text-[#004066] dark:text-[#ebf7ff] hover:bg-[#ebf7ff] dark:hover:bg-[#004066]/40",
 
   /** Messages (loading/no options) */
-  message: "px-3 py-2 text-sm text-slate-400 dark:text-slate-500",
+  message: "px-3 py-2 text-sm text-[#004066]/50 dark:text-[#ebf7ff]/50",
 } as const;

@@ -1,16 +1,33 @@
-import { LayoutDashboard } from "lucide-react";
+import {
+  LayoutDashboard,
+  Briefcase,
+  FileText,
+  FileSearch,
+  UserCheck,
+  UserX,
+  Users,
+  Sparkles,
+  CalendarCheck2,
+  CalendarClock,
+  CalendarCheck,
+  BarChart3,
+  Settings,
+  UserCog,
+  ShieldCheck,
+  Mail,
+} from "lucide-react";
 import type { MenuSection, MenuItem } from "@/shared/nav/Sidebar/types/types";
 
 // ==================== Sidebar Menu ====================
 
 export const SIDEBAR_MENU: MenuSection[] = [
   {
-    id: "1",
-    label: "Dashboard",
+    id: "overview-section",
+    label: "Overview",
     description: "Main overview & metrics",
     items: [
       {
-        id: "1-1",
+        id: "dashboard",
         key: "dashboard",
         label: "Dashboard",
         icon: LayoutDashboard,
@@ -19,12 +36,166 @@ export const SIDEBAR_MENU: MenuSection[] = [
       },
     ],
   },
+  {
+    id: "recruitment-section",
+    label: "Recruitment",
+    description: "Recruitment & candidate pipeline",
+    items: [
+      {
+        id: "recruitment",
+        key: "recruitment",
+        label: "Recruitment",
+        icon: Briefcase,
+        tooltip: "Recruitment & hiring workflow",
+        children: [
+          {
+            id: "recruitment-jobs",
+            key: "jobs",
+            label: "Jobs",
+            icon: Briefcase,
+            path: "/recruitment/jobs",
+            tooltip: "Manage Job Openings",
+          },
+          {
+            id: "recruitment-applications",
+            key: "applications",
+            label: "Applications",
+            icon: FileText,
+            path: "/recruitment/applications",
+            tooltip: "Candidate Applications",
+          },
+          {
+            id: "recruitment-screening",
+            key: "screening",
+            label: "Screening",
+            icon: FileSearch,
+            path: "/recruitment/screening",
+            tooltip: "AI CV Screening & Scoring",
+          },
+          {
+            id: "recruitment-shortlisted",
+            key: "shortlisted",
+            label: "Shortlisted",
+            icon: UserCheck,
+            path: "/recruitment/shortlisted",
+            tooltip: "Shortlisted Candidates",
+          },
+          {
+            id: "recruitment-rejected",
+            key: "rejected",
+            label: "Rejected",
+            icon: UserX,
+            path: "/recruitment/rejected",
+            tooltip: "Rejected Applications",
+          },
+        ],
+      },
+      {
+        id: "candidates",
+        key: "candidates",
+        label: "Candidates",
+        icon: Users,
+        tooltip: "Candidate Management",
+        children: [
+          {
+            id: "candidates-all",
+            key: "all-candidates",
+            label: "All Candidates",
+            icon: Users,
+            path: "/candidates/all",
+            tooltip: "All Candidates Database",
+          },
+          {
+            id: "candidates-talent-pool",
+            key: "talent-pool",
+            label: "Talent Pool",
+            icon: Sparkles,
+            path: "/candidates/talent-pool",
+            tooltip: "Curated Talent Pool",
+          },
+        ],
+      },
+      {
+        id: "interviews",
+        key: "interviews",
+        label: "Interviews",
+        icon: CalendarCheck2,
+        tooltip: "Interview Scheduling & Tracking",
+        children: [
+          {
+            id: "interviews-upcoming",
+            key: "upcoming",
+            label: "Upcoming",
+            icon: CalendarClock,
+            path: "/interviews/upcoming",
+            tooltip: "Scheduled Upcoming Interviews",
+          },
+          {
+            id: "interviews-completed",
+            key: "completed",
+            label: "Completed",
+            icon: CalendarCheck,
+            path: "/interviews/completed",
+            tooltip: "Completed Interview Logs & Feedback",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "management-section",
+    label: "Management",
+    description: "Analytics & system settings",
+    items: [
+      {
+        id: "reports",
+        key: "reports",
+        label: "Reports",
+        icon: BarChart3,
+        path: "/reports",
+        tooltip: "Analytics, Metrics & Reports",
+      },
+      {
+        id: "settings",
+        key: "settings",
+        label: "Settings",
+        icon: Settings,
+        tooltip: "System Configurations & Preferences",
+        children: [
+          {
+            id: "settings-users",
+            key: "users",
+            label: "Users",
+            icon: UserCog,
+            path: "/settings/users",
+            tooltip: "User Management & Accounts",
+          },
+          {
+            id: "settings-roles",
+            key: "roles-permissions",
+            label: "Roles & Permissions",
+            icon: ShieldCheck,
+            path: "/settings/roles-permissions",
+            tooltip: "Access Control & Permissions",
+          },
+          {
+            id: "settings-email-templates",
+            key: "email-templates",
+            label: "Email Templates",
+            icon: Mail,
+            path: "/settings/email-templates",
+            tooltip: "Recruitment & Notification Email Templates",
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 // ==================== Sidebar Configuration ====================
 
 export const SIDEBAR_CONFIG = {
-  companyName: "PassionNova\nTechnologis",
+  companyName: "System\nMechatronics",
   logo: null,
   menu: SIDEBAR_MENU,
 };

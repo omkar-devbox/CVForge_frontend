@@ -31,7 +31,7 @@ export interface ThemeProviderProps {
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "passionnova_technologis_theme",
+  storageKey = "system_mechatronics_theme",
 }: ThemeProviderProps) {
   const isFirstRender = useRef(true);
   const [theme, setThemeState] = useState<Theme>(() => {

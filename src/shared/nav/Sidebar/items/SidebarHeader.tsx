@@ -2,6 +2,7 @@ import { type FC, memo } from "react";
 import { PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { Tooltip } from "@/shared/ui";
 import { headerStyles } from "../styles/sidebar.styles";
+import { cn } from "../../../lib/utils";
 import type { SidebarHeaderProps } from "../types/types";
 
 export const SidebarHeader: FC<SidebarHeaderProps> = memo(({
@@ -10,11 +11,20 @@ export const SidebarHeader: FC<SidebarHeaderProps> = memo(({
   setIsHeaderHovered,
   onToggle,
   logo,
-  companyName = "Company",
+  companyName = "System\nMechatronics",
   side = "left",
   isMobileOpen = false,
   onCloseMobile,
 }) => {
+  const brandString = typeof companyName === "string" ? companyName : "System Mechatronics";
+  const parts = brandString.includes("\n")
+    ? brandString.split("\n")
+    : brandString.includes(" ")
+      ? [brandString.split(" ")[0], brandString.split(" ").slice(1).join(" ")]
+      : [brandString, ""];
+  const title = parts[0] || brandString;
+  const subtitle = parts[1] || "";
+
   return (
     <div
       className={headerStyles.container(collapsed)}
@@ -38,13 +48,20 @@ export const SidebarHeader: FC<SidebarHeaderProps> = memo(({
           ) : (
             <div className={headerStyles.logo}>
               <span className="text-white font-bold text-xl">
-                {companyName.charAt(0)}
+                {title.charAt(0) || "S"}
               </span>
             </div>
           )}
-          <span className={headerStyles.companyName(collapsed)}>
-            {companyName}
-          </span>
+          <div className={headerStyles.companyWrapper(collapsed)}>
+            <span className={headerStyles.companyTitle}>
+              {title}
+            </span>
+            {subtitle && (
+              <span className={headerStyles.companySubtitle}>
+                {subtitle}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons Area: Mobile Close vs Desktop Toggle */}
@@ -64,7 +81,7 @@ export const SidebarHeader: FC<SidebarHeaderProps> = memo(({
 
           {/* Desktop Toggle Button Area */}
           <div
-            className={headerStyles.toggleButtonArea(collapsed, isHeaderHovered, side)}
+            className={cn("hidden md:flex", headerStyles.toggleButtonArea(collapsed, isHeaderHovered, side))}
           >
             <Tooltip
               content={collapsed ? "Show sidebar" : "Hide sidebar"}

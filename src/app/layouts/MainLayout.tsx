@@ -58,7 +58,7 @@ export const MainLayout: FC<MainLayoutProps> = ({
 
   return (
     // ==================== Application Shell ====================
-    <div className="h-screen w-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-row overflow-hidden font-sans antialiased selection:bg-indigo-500 selection:text-white">
+    <div className="h-screen w-screen bg-[#ebf7ff] dark:bg-[#03131e] text-[#004066] dark:text-[#ebf7ff] flex flex-row overflow-hidden font-sans antialiased selection:bg-[#0077be] selection:text-white">
 
       {/* ==================== Sidebar ==================== */}
       <Sidebar
@@ -71,6 +71,7 @@ export const MainLayout: FC<MainLayoutProps> = ({
           name: currentUser.name || "",
           email: currentUser.email || "",
           avatar: currentUser.avatar,
+          role: currentUser.role,
           roles: currentUser.roles,
         }}
         onLogout={handleLogout}

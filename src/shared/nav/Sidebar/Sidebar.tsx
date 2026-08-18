@@ -38,7 +38,7 @@ export const Sidebar: FC<SidebarMainProps> = memo(({
   defaultWidth = 256,
   minWidth = 200,
   maxWidth = 480,
-  storageKey = "passionnova_technologis_sidebar_width",
+  storageKey = "system_mechatronics_sidebar_width",
   onWidthChange,
   menu = DEFAULT_SIDEBAR_CONFIG.menu,
   side = "left",
@@ -233,6 +233,9 @@ export const Sidebar: FC<SidebarMainProps> = memo(({
     return menu.filter((section: MenuSection) => section.items.length > 0);
   }, [menu]);
 
+  // On mobile drawer, sidebar must always render fully expanded (never icon-only collapsed)
+  const isEffectiveCollapsed = isMobileOpen ? false : collapsed;
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -261,7 +264,7 @@ export const Sidebar: FC<SidebarMainProps> = memo(({
         }
       >
         <SidebarHeader
-          collapsed={collapsed}
+          collapsed={isEffectiveCollapsed}
           isHeaderHovered={isHeaderHovered}
           setIsHeaderHovered={setIsHeaderHovered}
           onToggle={() => setCollapsed(!collapsed)}
@@ -274,14 +277,14 @@ export const Sidebar: FC<SidebarMainProps> = memo(({
 
         <SidebarNav
           menu={filteredMenu}
-          collapsed={collapsed}
+          collapsed={isEffectiveCollapsed}
           onExpand={() => setCollapsed(false)}
           side={side}
           onCloseMobile={handleMobileClose}
         />
 
         <SidebarFooter
-          collapsed={collapsed}
+          collapsed={isEffectiveCollapsed}
           onLogout={onLogout || (() => console.log("Logout clicked"))}
           user={user}
           side={side}

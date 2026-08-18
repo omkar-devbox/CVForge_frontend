@@ -103,57 +103,57 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
 
       {/* Workbook Stats Header */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#061a29] border border-[#004066]/15 dark:border-[#004066]/40 shadow-sm flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-[#0077be]/10 text-[#0077be] dark:text-[#38bdf8] flex items-center justify-center font-bold">
             <Layers className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 font-medium">
               Worksheets
             </div>
-            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <div className="text-lg font-bold text-[#004066] dark:text-[#ebf7ff]">
               {analysisData.sheet_count} Sheet{analysisData.sheet_count > 1 ? "s" : ""}
             </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#061a29] border border-[#004066]/15 dark:border-[#004066]/40 shadow-sm flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
             <CheckCircle2 className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 font-medium">
               Detected Header Row
             </div>
-            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <div className="text-lg font-bold text-[#004066] dark:text-[#ebf7ff]">
               Row #{currentSheet.detected_header_row_index || 1}
             </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#061a29] border border-[#004066]/15 dark:border-[#004066]/40 shadow-sm flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-[#0077be]/10 text-[#0077be] dark:text-[#38bdf8] flex items-center justify-center font-bold">
             <Code className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 font-medium">
               Excel Formulas
             </div>
-            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <div className="text-lg font-bold text-[#004066] dark:text-[#ebf7ff]">
               {formulaCount} {formulaCount === 1 ? "Formula" : "Formulas"}
             </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#061a29] border border-[#004066]/15 dark:border-[#004066]/40 shadow-sm flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
             <Grid className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70 font-medium">
               Merged Regions
             </div>
-            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <div className="text-lg font-bold text-[#004066] dark:text-[#ebf7ff]">
               {mergedCount} Range{mergedCount === 1 ? "" : "s"}
             </div>
           </div>
@@ -163,7 +163,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
       {/* Sheet Tabs */}
       {analysisData.sheet_count > 1 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-1">
+          <span className="text-xs font-bold text-[#004066]/60 dark:text-[#ebf7ff]/60 uppercase tracking-wider mr-1">
             Worksheets:
           </span>
           {analysisData.sheets.map((sheet, index) => (
@@ -173,10 +173,10 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                 setActiveSheetIndex(index);
                 setSearchQuery("");
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 activeSheetIndex === index
-                  ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30"
-                  : "bg-white dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60"
+                  ? "bg-[#0077be] text-white shadow-sm shadow-[#0077be]/30"
+                  : "bg-white dark:bg-[#061a29] text-[#004066] dark:text-[#ebf7ff] hover:bg-[#ebf7ff] dark:hover:bg-[#004066]/40 border border-[#004066]/15 dark:border-[#004066]/40"
               }`}
             >
               <FileSpreadsheet className="h-3.5 w-3.5" />
@@ -187,16 +187,16 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
       )}
 
       {/* Sheet Details Container */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800/90 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-[#061a29] border border-[#004066]/15 dark:border-[#004066]/40 rounded-2xl overflow-hidden shadow-sm">
         {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 pt-4 overflow-x-auto">
+        <div className="flex items-center justify-between border-b border-[#004066]/10 dark:border-[#004066]/40 px-6 pt-4 overflow-x-auto">
           <div className="flex items-center gap-6">
             <button
               onClick={() => setActiveTab("preview")}
-              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
+              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
                 activeTab === "preview"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "border-[#0077be] text-[#0077be] dark:text-[#38bdf8]"
+                  : "border-transparent text-[#004066]/70 dark:text-[#ebf7ff]/70 hover:text-[#004066] dark:hover:text-white"
               }`}
             >
               <TableIcon className="h-4 w-4" />
@@ -205,16 +205,16 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
 
             <button
               onClick={() => setActiveTab("formulas")}
-              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
+              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
                 activeTab === "formulas"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "border-[#0077be] text-[#0077be] dark:text-[#38bdf8]"
+                  : "border-transparent text-[#004066]/70 dark:text-[#ebf7ff]/70 hover:text-[#004066] dark:hover:text-white"
               }`}
             >
               <Code className="h-4 w-4" />
               Formulas & Comments
               {formulaCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#0077be]/10 dark:bg-[#0077be]/25 text-[#0077be] dark:text-[#38bdf8]">
                   {formulaCount}
                 </span>
               )}
@@ -222,10 +222,10 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
 
             <button
               onClick={() => setActiveTab("merged")}
-              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
+              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
                 activeTab === "merged"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "border-[#0077be] text-[#0077be] dark:text-[#38bdf8]"
+                  : "border-transparent text-[#004066]/70 dark:text-[#ebf7ff]/70 hover:text-[#004066] dark:hover:text-white"
               }`}
             >
               <Grid className="h-4 w-4" />
@@ -239,10 +239,10 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
 
             <button
               onClick={() => setActiveTab("protection")}
-              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
+              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
                 activeTab === "protection"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "border-[#0077be] text-[#0077be] dark:text-[#38bdf8]"
+                  : "border-transparent text-[#004066]/70 dark:text-[#ebf7ff]/70 hover:text-[#004066] dark:hover:text-white"
               }`}
             >
               {isProtected ? (
@@ -255,10 +255,10 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
 
             <button
               onClick={() => setActiveTab("dimensions")}
-              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
+              className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
                 activeTab === "dimensions"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "border-[#0077be] text-[#0077be] dark:text-[#38bdf8]"
+                  : "border-transparent text-[#004066]/70 dark:text-[#ebf7ff]/70 hover:text-[#004066] dark:hover:text-white"
               }`}
             >
               <Sliders className="h-4 w-4" />
@@ -274,7 +274,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#0077be]/10 dark:bg-[#0077be]/25 text-[#0077be] dark:text-[#38bdf8] border border-[#0077be]/20">
                     Header Detected at Row #{currentSheet.detected_header_row_index || 1}
                   </span>
                   {liveUpdateInfo && (
@@ -282,55 +282,55 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                       <Zap className="h-3 w-3 animate-pulse text-emerald-500" /> Live Synced Preview
                     </span>
                   )}
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                  <span className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70">
                     Showing top 10 preview rows
                   </span>
                 </div>
 
                 <div className="relative w-64">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#004066]/40 dark:text-[#ebf7ff]/40" />
                   <input
                     type="text"
                     placeholder="Search in preview..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#ebf7ff]/40 dark:bg-[#041829]/60 border border-[#004066]/20 dark:border-[#004066]/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0077be] text-[#004066] dark:text-[#ebf7ff]"
                   />
                 </div>
               </div>
 
               {currentSheet.headers && currentSheet.headers.length > 0 ? (
-                <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-inner">
+                <div className="overflow-x-auto border border-[#004066]/15 dark:border-[#004066]/40 rounded-xl shadow-inner">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-700">
-                        <th className="py-2.5 px-3 w-12 text-center text-slate-400 font-mono border-r border-slate-200 dark:border-slate-700/80">
+                      <tr className="bg-[#ebf7ff] dark:bg-[#041829] text-[#004066] dark:text-[#ebf7ff] font-semibold border-b border-[#004066]/15 dark:border-[#004066]/40">
+                        <th className="py-2.5 px-3 w-12 text-center text-[#004066]/60 dark:text-[#ebf7ff]/60 font-mono border-r border-[#004066]/15 dark:border-[#004066]/40">
                           #
                         </th>
                         {currentSheet.headers.map((hdr, idx) => (
                           <th
                             key={idx}
-                            className="py-2.5 px-4 whitespace-nowrap border-r border-slate-200 dark:border-slate-700/80 last:border-r-0"
+                            className="py-2.5 px-4 whitespace-nowrap border-r border-[#004066]/15 dark:border-[#004066]/40 last:border-r-0"
                           >
                             {hdr}
                           </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80">
+                    <tbody className="divide-y divide-[#004066]/10 dark:divide-[#004066]/30">
                       {filteredRows.length > 0 ? (
                         filteredRows.map((row, rIdx) => (
                           <tr
                             key={rIdx}
-                            className="hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-colors"
+                            className="hover:bg-[#ebf7ff]/60 dark:hover:bg-[#004066]/30 transition-colors"
                           >
-                            <td className="py-2 px-3 text-center text-slate-400 font-mono bg-slate-50/50 dark:bg-slate-800/30 border-r border-slate-200 dark:border-slate-800">
+                            <td className="py-2 px-3 text-center text-[#004066]/60 dark:text-[#ebf7ff]/60 font-mono bg-[#ebf7ff]/40 dark:bg-[#041829]/50 border-r border-[#004066]/15 dark:border-[#004066]/40">
                               {rIdx + 1}
                             </td>
                             {currentSheet.headers?.map((hdr, cIdx) => (
                               <td
                                 key={cIdx}
-                                className="py-2 px-4 whitespace-nowrap text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800/80 last:border-r-0 font-sans"
+                                className="py-2 px-4 whitespace-nowrap text-[#004066] dark:text-[#ebf7ff] border-r border-[#004066]/10 dark:border-[#004066]/30 last:border-r-0 font-sans"
                               >
                                 {row[hdr] !== undefined && row[hdr] !== null
                                   ? String(row[hdr])
@@ -343,7 +343,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                         <tr>
                           <td
                             colSpan={(currentSheet.headers?.length || 0) + 1}
-                            className="py-8 text-center text-slate-400"
+                            className="py-8 text-center text-[#004066]/60 dark:text-[#ebf7ff]/60"
                           >
                             No data rows match your search query.
                           </td>
@@ -353,7 +353,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                   </table>
                 </div>
               ) : (
-                <div className="p-8 text-center text-slate-400 border border-dashed rounded-xl">
+                <div className="p-8 text-center text-[#004066]/60 dark:text-[#ebf7ff]/60 border border-dashed rounded-xl">
                   No preview data or headers available for this sheet.
                 </div>
               )}
@@ -364,8 +364,8 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
           {activeTab === "formulas" && (
             <div className="flex flex-col gap-6">
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3">
-                  <Code className="h-4 w-4 text-blue-500" />
+                <h4 className="text-sm font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-2 mb-3">
+                  <Code className="h-4 w-4 text-[#0077be]" />
                   Worksheet Formulas ({formulaCount})
                 </h4>
 
@@ -374,9 +374,9 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                     {currentSheet.formulas.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex items-start justify-between gap-3"
+                        className="p-3 rounded-xl bg-white dark:bg-[#041829]/80 border border-[#004066]/15 dark:border-[#004066]/40 flex items-start justify-between gap-3 shadow-xs"
                       >
-                        <span className="px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300 font-mono font-bold text-xs shrink-0">
+                        <span className="px-2 py-1 rounded bg-[#0077be]/10 dark:bg-[#0077be]/25 text-[#0077be] dark:text-[#38bdf8] font-mono font-bold text-xs shrink-0">
                           {item.coordinate}
                         </span>
                         <code className="text-xs text-emerald-600 dark:text-emerald-400 font-mono break-all text-right font-medium">
@@ -386,7 +386,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                  <p className="text-xs text-[#004066]/60 dark:text-[#ebf7ff]/60 italic">
                     No formula cells detected in this sheet.
                   </p>
                 )}
@@ -394,7 +394,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
 
               {currentSheet.comments && currentSheet.comments.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3">
+                  <h4 className="text-sm font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-2 mb-3">
                     <FileText className="h-4 w-4 text-amber-500" />
                     Cell Comments ({currentSheet.comments.length})
                   </h4>
@@ -412,7 +412,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                             </span>
                           )}
                         </div>
-                        <p className="text-slate-700 dark:text-slate-300 mt-1">
+                        <p className="text-[#004066] dark:text-[#ebf7ff] mt-1">
                           {cm.text}
                         </p>
                       </div>
@@ -426,7 +426,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
           {/* TAB 3: MERGED CELLS */}
           {activeTab === "merged" && (
             <div>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3">
+              <h4 className="text-sm font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-2 mb-3">
                 <Grid className="h-4 w-4 text-amber-500" />
                 Merged Cell Ranges ({mergedCount})
               </h4>
@@ -443,7 +443,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                <p className="text-xs text-[#004066]/60 dark:text-[#ebf7ff]/60 italic">
                   No merged cells present in this sheet.
                 </p>
               )}
@@ -454,13 +454,13 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
           {activeTab === "protection" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3">
-                  <ShieldCheck className="h-4 w-4 text-blue-500" />
+                <h4 className="text-sm font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-2 mb-3">
+                  <ShieldCheck className="h-4 w-4 text-[#0077be]" />
                   Worksheet Protection
                 </h4>
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+                <div className="p-4 rounded-xl bg-[#ebf7ff]/40 dark:bg-[#041829]/60 border border-[#004066]/15 dark:border-[#004066]/40 text-xs">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-slate-600 dark:text-slate-400">
+                    <span className="text-[#004066]/70 dark:text-[#ebf7ff]/70 font-medium">
                       Protection Status
                     </span>
                     <span
@@ -475,8 +475,8 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                   </div>
 
                   {currentSheet.sheet_protection?.permissions && (
-                    <div className="space-y-1.5 border-t border-slate-200 dark:border-slate-700/60 pt-3">
-                      <p className="font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <div className="space-y-1.5 border-t border-[#004066]/10 dark:border-[#004066]/30 pt-3">
+                      <p className="font-semibold text-[#004066] dark:text-[#ebf7ff] mb-1">
                         User Permissions:
                       </p>
                       {Object.entries(
@@ -486,12 +486,12 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                           key={key}
                           className="flex items-center justify-between text-[11px]"
                         >
-                          <span className="text-slate-500 dark:text-slate-400 capitalize">
+                          <span className="text-[#004066]/70 dark:text-[#ebf7ff]/70 capitalize">
                             {key.replace(/_/g, " ")}
                           </span>
                           <span
                             className={
-                              allowed ? "text-emerald-500" : "text-rose-500"
+                              allowed ? "text-emerald-500 font-semibold" : "text-rose-500 font-semibold"
                             }
                           >
                             {allowed ? "Allowed" : "Locked"}
@@ -504,8 +504,8 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
               </div>
 
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3">
-                  <Sliders className="h-4 w-4 text-purple-500" />
+                <h4 className="text-sm font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-2 mb-3">
+                  <Sliders className="h-4 w-4 text-[#0077be]" />
                   Data Validation Rules ({validationCount})
                 </h4>
                 {validationCount > 0 ? (
@@ -513,16 +513,16 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                     {currentSheet.data_validations?.map((dv, idx) => (
                       <div
                         key={idx}
-                        className="p-3 rounded-xl bg-purple-500/5 dark:bg-purple-950/20 border border-purple-500/20 text-xs"
+                        className="p-3 rounded-xl bg-white dark:bg-[#041829]/80 border border-[#004066]/15 dark:border-[#004066]/40 text-xs shadow-xs"
                       >
-                        <div className="flex items-center justify-between font-semibold text-purple-800 dark:text-purple-300">
+                        <div className="flex items-center justify-between font-semibold text-[#004066] dark:text-[#ebf7ff]">
                           <span>Target: {dv.sqref}</span>
-                          <span className="uppercase text-[10px] bg-purple-100 dark:bg-purple-900/60 px-1.5 py-0.5 rounded">
+                          <span className="uppercase text-[10px] bg-[#0077be]/10 dark:bg-[#0077be]/25 text-[#0077be] dark:text-[#38bdf8] px-1.5 py-0.5 rounded font-bold">
                             {dv.type || "Custom"}
                           </span>
                         </div>
                         {dv.formula1 && (
-                          <div className="text-slate-600 dark:text-slate-400 mt-1 font-mono text-[11px]">
+                          <div className="text-[#004066]/70 dark:text-[#ebf7ff]/70 mt-1 font-mono text-[11px]">
                             Rule: {dv.formula1}
                           </div>
                         )}
@@ -530,7 +530,7 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                  <p className="text-xs text-[#004066]/60 dark:text-[#ebf7ff]/60 italic">
                     No data validation / drop-down rules set.
                   </p>
                 )}
@@ -541,38 +541,38 @@ export const SheetMetadataViewer: React.FC<SheetMetadataViewerProps> = ({
           {/* TAB 5: DIMENSIONS & SETUP */}
           {activeTab === "dimensions" && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
-                <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5">
-                  <Maximize2 className="h-4 w-4 text-blue-500" /> Grid Boundaries
+              <div className="p-4 rounded-xl bg-white dark:bg-[#041829]/80 border border-[#004066]/15 dark:border-[#004066]/40 shadow-xs">
+                <h5 className="font-bold text-[#004066] dark:text-[#ebf7ff] mb-2 flex items-center gap-1.5">
+                  <Maximize2 className="h-4 w-4 text-[#0077be]" /> Grid Boundaries
                 </h5>
-                <p className="text-slate-600 dark:text-slate-400">
-                  Max Rows: <strong className="text-slate-900 dark:text-slate-100">{currentSheet.max_row}</strong>
+                <p className="text-[#004066]/70 dark:text-[#ebf7ff]/70">
+                  Max Rows: <strong className="text-[#004066] dark:text-[#ebf7ff]">{currentSheet.max_row}</strong>
                 </p>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">
-                  Max Columns: <strong className="text-slate-900 dark:text-slate-100">{currentSheet.max_column}</strong>
+                <p className="text-[#004066]/70 dark:text-[#ebf7ff]/70 mt-1">
+                  Max Columns: <strong className="text-[#004066] dark:text-[#ebf7ff]">{currentSheet.max_column}</strong>
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
-                <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">
+              <div className="p-4 rounded-xl bg-white dark:bg-[#041829]/80 border border-[#004066]/15 dark:border-[#004066]/40 shadow-xs">
+                <h5 className="font-bold text-[#004066] dark:text-[#ebf7ff] mb-2">
                   Hidden Content
                 </h5>
-                <p className="text-slate-600 dark:text-slate-400">
+                <p className="text-[#004066]/70 dark:text-[#ebf7ff]/70">
                   Hidden Rows: {currentSheet.hidden_rows?.length || 0}
                 </p>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-[#004066]/70 dark:text-[#ebf7ff]/70 mt-1">
                   Hidden Columns: {currentSheet.hidden_columns?.length || 0}
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
-                <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">
+              <div className="p-4 rounded-xl bg-white dark:bg-[#041829]/80 border border-[#004066]/15 dark:border-[#004066]/40 shadow-xs">
+                <h5 className="font-bold text-[#004066] dark:text-[#ebf7ff] mb-2">
                   Panes & Filters
                 </h5>
-                <p className="text-slate-600 dark:text-slate-400">
+                <p className="text-[#004066]/70 dark:text-[#ebf7ff]/70">
                   Freeze Panes: {currentSheet.freeze_panes || "None"}
                 </p>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-[#004066]/70 dark:text-[#ebf7ff]/70 mt-1">
                   Auto Filter: {currentSheet.auto_filter_range || "None"}
                 </p>
               </div>

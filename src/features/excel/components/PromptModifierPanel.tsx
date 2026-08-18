@@ -97,18 +97,18 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm p-6 flex flex-col gap-6">
+    <div className="rounded-2xl border border-[#004066]/15 dark:border-[#004066]/40 bg-white dark:bg-[#061a29] shadow-sm p-6 flex flex-col gap-6">
       {/* Header with AI Model Connection Status */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#0077be] to-[#004066] text-white flex items-center justify-center shadow-md shadow-[#0077be]/20">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-base font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-2">
               AI Natural Language Excel Modifier
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-[#004066]/70 dark:text-[#ebf7ff]/70">
               {selectedFile
                 ? `Modifying target: ${selectedFile.name}`
                 : "No file uploaded. Prompt will generate a fresh modified Excel spreadsheet."}
@@ -118,7 +118,7 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
 
         {/* Model Status Indicator */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#ebf7ff] dark:bg-[#041829] border border-[#004066]/15 dark:border-[#004066]/40 text-xs">
             <div className="relative flex h-2.5 w-2.5">
               <span
                 className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
@@ -132,11 +132,11 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1 text-[11px]">
-                <Cpu className="h-3.5 w-3.5 text-indigo-500" />
+              <span className="font-bold text-[#004066] dark:text-[#ebf7ff] flex items-center gap-1 text-[11px]">
+                <Cpu className="h-3.5 w-3.5 text-[#0077be]" />
                 {modelStatus?.connected ? "Model Connected" : "AI Engine Active"}
               </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
+              <span className="text-[10px] text-[#004066]/70 dark:text-[#ebf7ff]/70 truncate max-w-[200px]">
                 {modelStatus?.mode || "Checking connection..."}
               </span>
             </div>
@@ -146,7 +146,7 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
             onClick={loadModelStatus}
             disabled={isCheckingModel}
             title="Check Model Connection Status"
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            className="p-2 rounded-xl bg-[#ebf7ff] dark:bg-[#041829] text-[#004066]/70 dark:text-[#ebf7ff]/70 hover:bg-[#0077be]/10 dark:hover:bg-[#0077be]/20 transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isCheckingModel ? "animate-spin" : ""}`} />
           </button>
@@ -155,7 +155,7 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
 
       {/* Preset Suggestion Chips */}
       <div>
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#004066]/70 dark:text-[#ebf7ff]/70 mb-2">
           <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
           Sample Prompt Instructions:
         </div>
@@ -165,7 +165,7 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
               key={idx}
               type="button"
               onClick={() => setPromptText(sample)}
-              className="text-left text-xs px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-300 border border-slate-200 dark:border-slate-700/60 transition-all"
+              className="text-left text-xs px-3 py-1.5 rounded-xl bg-[#ebf7ff]/70 dark:bg-[#041829]/70 text-[#004066] dark:text-[#ebf7ff] hover:bg-[#0077be]/10 hover:text-[#0077be] dark:hover:bg-[#0077be]/20 dark:hover:text-[#38bdf8] border border-[#004066]/10 dark:border-[#004066]/30 transition-all cursor-pointer"
             >
               "{sample}"
             </button>
@@ -182,14 +182,14 @@ export const PromptModifierPanel: React.FC<PromptModifierPanelProps> = ({
             onChange={(e) => setPromptText(e.target.value)}
             placeholder="Describe what changes, calculations, formatting, or row operations you want to perform..."
             disabled={isProcessing}
-            className="w-full p-4 rounded-xl text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100 resize-none placeholder:text-slate-400"
+            className="w-full p-4 rounded-xl text-sm bg-[#ebf7ff]/30 dark:bg-[#03131e] border border-[#004066]/20 dark:border-[#004066]/40 focus:outline-none focus:ring-2 focus:ring-[#0077be] text-[#004066] dark:text-[#ebf7ff] resize-none placeholder:text-[#004066]/40"
           />
 
           <div className="absolute right-3 bottom-3">
             <button
               type="submit"
               disabled={isProcessing || !promptText.trim()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#0077be] hover:bg-[#00639e] disabled:opacity-50 shadow-md shadow-[#0077be]/20 transition-all active:scale-95 cursor-pointer"
             >
               {isProcessing ? (
                 <>

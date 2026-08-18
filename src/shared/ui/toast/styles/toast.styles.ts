@@ -49,15 +49,15 @@ export const NOTIFICATION_CONFIG: Record<
   },
   info: {
     icon: Info,
-    badgeBgClass: "bg-blue-500/10 dark:bg-blue-500/20",
-    badgeTextClass: "text-blue-600 dark:text-blue-400",
-    progressClass: "bg-blue-500",
+    badgeBgClass: "bg-[#0077be]/10 dark:bg-[#0077be]/20",
+    badgeTextClass: "text-[#0077be] dark:text-[#38bdf8]",
+    progressClass: "bg-[#0077be]",
   },
   loading: {
     icon: Loader2,
-    badgeBgClass: "bg-indigo-500/10 dark:bg-indigo-500/20",
-    badgeTextClass: "text-indigo-600 dark:text-indigo-400",
-    progressClass: "bg-indigo-500",
+    badgeBgClass: "bg-[#0077be]/10 dark:bg-[#0077be]/20",
+    badgeTextClass: "text-[#0077be] dark:text-[#38bdf8]",
+    progressClass: "bg-[#0077be]",
     animate: "animate-spin",
   },
 };
@@ -76,17 +76,17 @@ export const POSITION_MAP: Record<ToastPosition, string> = {
 };
 
 /* ---------------------------------- */
-/* MAIN CARD (MINIMALIST SONNER / VERCEL DESIGN) */
+/* MAIN CARD */
 /* ---------------------------------- */
 
 export const notificationVariants = cva(
   `
   group relative flex items-start gap-3 p-3.5
   w-full min-w-[320px] max-w-[400px]
-  rounded-xl border border-border/80 dark:border-neutral-800
-  bg-background/95 dark:bg-neutral-900/95
-  text-foreground
-  shadow-md shadow-black/5 dark:shadow-black/25
+  rounded-xl border border-[#004066]/15 dark:border-[#004066]/40
+  bg-white/95 dark:bg-[#061a29]/95
+  text-[#004066] dark:text-[#ebf7ff]
+  shadow-lg shadow-[#004066]/10 dark:shadow-black/40
   backdrop-blur-md overflow-hidden
   transition-all duration-200 ease-out
   pointer-events-auto select-none
@@ -116,19 +116,19 @@ export const NOTIFICATION_UI = {
 
   closeButton: `
     flex-shrink-0 size-6 rounded-md flex items-center justify-center -mr-1 -mt-0.5
-    text-muted-foreground/70 hover:text-foreground
-    hover:bg-accent/60 active:scale-95
+    text-[#004066]/50 hover:text-[#004066] dark:text-[#ebf7ff]/50 dark:hover:text-[#ebf7ff]
+    hover:bg-[#ebf7ff] dark:hover:bg-[#004066]/40 active:scale-95
     transition-all cursor-pointer
     `,
 
   actionButton: `
-    inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium rounded-md
-    bg-accent/80 hover:bg-accent text-accent-foreground
-    border border-border/60 transition-colors cursor-pointer active:scale-95
+    inline-flex items-center justify-center px-2.5 py-1 text-xs font-semibold rounded-md
+    bg-[#0077be] hover:bg-[#00639e] text-white
+    border border-[#0077be]/40 transition-colors cursor-pointer active:scale-95
     `,
 
   progressBarTrack:
-    "absolute bottom-0 left-0 w-full h-[2.5px] bg-muted/30 overflow-hidden",
+    "absolute bottom-0 left-0 w-full h-[2.5px] bg-[#004066]/10 dark:bg-[#004066]/30 overflow-hidden",
 
   progressBar: `
     h-full w-full origin-left

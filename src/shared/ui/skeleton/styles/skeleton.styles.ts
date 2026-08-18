@@ -8,8 +8,8 @@ import { cva } from "class-variance-authority";
 export const skeletonVariants = cva(
   [
     "relative overflow-hidden select-none pointer-events-none transition-all duration-300",
-    // Premium theme-aware base colors
-    "bg-neutral-200/70 dark:bg-neutral-800/70",
+    // 60-30-10 theme-aware base colors
+    "bg-[#004066]/10 dark:bg-[#004066]/30",
     // Motion accessibility: stop fast shimmer for reduced-motion users
     "motion-reduce:after:hidden motion-reduce:animate-pulse",
   ].join(" "),
