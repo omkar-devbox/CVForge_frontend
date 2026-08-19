@@ -10,6 +10,7 @@ const JobsPage = lazy(() => import("@/features/recruitment/jobs/jobs"));
 const ApplicationsPage = lazy(() => import("@/features/recruitment/applications/application"));
 const AllCandidatesPage = lazy(() => import("@/features/candidates/allcandidates/allcandidates"));
 const TalentPoolPage = lazy(() => import("@/features/candidates/talentpool/talentpool"));
+const UpcomingInterviewsPage = lazy(() => import("@/features/interviews/upcoming/upcoming"));
 const UnauthorizedPage = lazy(() =>
   import("@/shared/pages/unauthorized/UnauthorizedPage")
 );
@@ -144,6 +145,16 @@ export function AppRouter() {
           }
         />
 
+        {/* Upcoming Interviews Route */}
+        <Route
+          path="/interviews/upcoming"
+          element={
+            <MainLayout pageTitle="Upcoming Interviews" pageSubtitle="Schedule, manage, and conduct upcoming candidate interviews">
+              <UpcomingInterviewsPage />
+            </MainLayout>
+          }
+        />
+
         {/* Dynamic Sidebar Module & Settings Routes */}
         {moduleRoutes
           .filter(
@@ -153,7 +164,8 @@ export function AppRouter() {
               route.path !== "/candidates/all" &&
               route.path !== "/candidates/allcandidates" &&
               route.path !== "/candidates/talent-pool" &&
-              route.path !== "/candidates/talentpool"
+              route.path !== "/candidates/talentpool" &&
+              route.path !== "/interviews/upcoming"
           )
           .map((route) => (
             <Route
