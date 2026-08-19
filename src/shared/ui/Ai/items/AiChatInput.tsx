@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from "react";
-import { Send, Paperclip, Square } from "lucide-react";
+import { Send, Square } from "lucide-react";
 import { FileAttachment } from "./AiChatArea";
 import { aiChatInputStyles } from "../styles/aiSidebar.styles";
 import type { AiChatInputProps } from "../types";
@@ -76,7 +76,7 @@ export const AiChatInput = ({
         )}
 
         {/* input */}
-        <div className="relative group">
+        <div className="relative group flex items-center">
           <textarea
             ref={textareaRef}
             value={input}
@@ -102,24 +102,15 @@ export const AiChatInput = ({
               </button>
             ) : (
               <button
-                onClick={() => fileInputRef.current?.click()} // open file picker
-                className={aiChatInputStyles.attachButton}
-                title="Attach file"
+                onClick={handleSend}
+                disabled={(!input.trim() && attachments.length === 0) || isTyping} // disable invalid send
+                className={aiChatInputStyles.sendButton}
                 type="button"
+                aria-label="Send message"
               >
-                <Paperclip size={18} />
+                <Send size={18} />
               </button>
             )}
-
-            <button
-              onClick={handleSend}
-              disabled={(!input.trim() && attachments.length === 0) || isTyping} // disable invalid send
-              className={aiChatInputStyles.sendButton}
-              type="button"
-              aria-label="Send message"
-            >
-              <Send size={18} />
-            </button>
           </div>
         </div>
 

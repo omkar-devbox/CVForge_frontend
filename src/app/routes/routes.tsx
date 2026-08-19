@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { SIDEBAR_MENU } from "../menu/menuItems";
 
 // Lazy loading page components
+const DashboardPage = lazy(() => import("@/features/dashboard/dashboard"));
 const GenericPage = lazy(() => import("@/shared/pages/GenericPage/GenericPage"));
 const JobsPage = lazy(() => import("@/features/recruitment/jobs/jobs"));
 const ApplicationsPage = lazy(() => import("@/features/recruitment/applications/application"));
@@ -80,7 +81,7 @@ export function AppRouter() {
           path="/"
           element={
             <MainLayout pageTitle="Dashboard" pageSubtitle="Overview & Analytics Dashboard">
-              <GenericPage />
+              <DashboardPage />
             </MainLayout>
           }
         />
@@ -88,7 +89,7 @@ export function AppRouter() {
           path="/dashboard"
           element={
             <MainLayout pageTitle="Dashboard" pageSubtitle="Overview & Analytics Dashboard">
-              <GenericPage />
+              <DashboardPage />
             </MainLayout>
           }
         />

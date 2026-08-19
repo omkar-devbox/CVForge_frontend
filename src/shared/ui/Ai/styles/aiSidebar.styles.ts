@@ -123,9 +123,9 @@ export const aiChatInputStyles = {
   root: "p-4 border-t border-[#004066]/15 dark:border-[#004066]/40 bg-[#ebf7ff] dark:bg-[#03131e] shrink-0",
   inner: "relative flex flex-col gap-2",
   attachmentPreview: "flex flex-wrap gap-2 mb-2 p-2 bg-[#ebf7ff]/40 dark:bg-[#041829]/60 rounded-xl border border-dashed border-[#004066]/20",
-  textarea: "w-full bg-white dark:bg-[#061a29] border border-[#004066]/20 dark:border-[#004066]/40 rounded-2xl px-4 py-3 pr-24 text-sm focus:outline-none focus:ring-2 focus:ring-[#0077be]/20 focus:border-[#0077be] text-[#004066] dark:text-[#ebf7ff] placeholder:text-[#004066]/40 transition-all resize-none min-h-[50px] max-h-[200px] scrollbar-hide",
-  actionGroup: "absolute right-2 bottom-2 flex items-center gap-1 bg-white/80 dark:bg-[#061a29]/80 backdrop-blur-sm p-1 rounded-xl border border-[#004066]/15 shadow-sm",
-  sendButton: "p-2 bg-[#0077be] text-white rounded-xl hover:bg-[#00639e] transition-all disabled:opacity-50 disabled:hover:bg-[#0077be] shadow-md shadow-[#0077be]/20 flex items-center justify-center active:scale-95 cursor-pointer",
+  textarea: "w-full bg-white dark:bg-[#061a29] border border-[#004066]/20 dark:border-[#004066]/40 rounded-2xl pl-4 py-3.5 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-[#0077be]/20 focus:border-[#0077be] text-[#004066] dark:text-[#ebf7ff] placeholder:text-[#004066]/40 transition-all resize-none min-h-[52px] max-h-[200px] scrollbar-hide",
+  actionGroup: "absolute right-2 bottom-2 flex items-center justify-center z-10",
+  sendButton: "w-9 h-9 bg-[#0077be] text-white rounded-xl hover:bg-[#00639e] transition-all disabled:opacity-40 disabled:hover:bg-[#0077be] shadow-md shadow-[#0077be]/20 flex items-center justify-center active:scale-95 cursor-pointer disabled:cursor-not-allowed",
   attachButton: "p-2 text-[#004066]/60 dark:text-[#ebf7ff]/60 hover:text-[#0077be] hover:bg-[#0077be]/10 rounded-xl transition-all flex items-center justify-center active:scale-95 cursor-pointer",
-  stopButton: "p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-95 flex items-center justify-center cursor-pointer",
+  stopButton: "w-9 h-9 text-rose-500 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 rounded-xl transition-all active:scale-95 flex items-center justify-center cursor-pointer",
 };
