@@ -58,7 +58,7 @@ const DataTableRowInner = <T,>({
               ? calculateOffset(orderedColumns, idx, "right", sizing)
               : undefined
           }
-          isLast={idx === orderedColumns.length - 1}
+          isLast={idx === orderedColumns.length - 1 || !!col.isLast}
           isSecondToLast={idx === orderedColumns.length - 2}
           isSelected={isSelected}
           onClick={
@@ -133,7 +133,7 @@ const DataTableCellInner = <T,>({
       style={{
         width: `${width || 150}px`,
         minWidth: `${width || 150}px`,
-        maxWidth: column.maxWidth ? `${column.maxWidth}px` : undefined,
+        maxWidth: column.maxWidth ? `${column.maxWidth}px` : "30%",
         left: leftOffset !== undefined ? `${leftOffset}px` : undefined,
         right: rightOffset !== undefined ? `${rightOffset}px` : undefined,
       }}

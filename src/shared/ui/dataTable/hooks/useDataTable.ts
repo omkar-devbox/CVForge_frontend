@@ -302,7 +302,7 @@ export function useDataTable<T>(props: DataTableProps<T>) {
   // Derived state: Column Widths
   const columnWidths = useMemo(() => {
     const widths: Record<string, number> = {};
-    for (const col of columnDefs) {
+    for (const col of visibleColumns) {
       if (state.columns.sizing[col.id] !== undefined) {
         widths[col.id] = state.columns.sizing[col.id];
       } else if (col.width !== undefined) {
@@ -312,7 +312,7 @@ export function useDataTable<T>(props: DataTableProps<T>) {
       }
     }
     return widths;
-  }, [columnDefs, data, state.columns.sizing]);
+  }, [visibleColumns, data, state.columns.sizing]);
 
   return {
     state,

@@ -63,7 +63,7 @@ export const getModalStyle = (config?: ModalStyleConfig) => {
       contentCol: "flex flex-col gap-0.5",
       title: `${c.header?.titleSize} ${c.header?.titleColor} leading-tight`,
       description: `${c.header?.descSize} ${c.header?.descColor} leading-relaxed`,
-      closeButton: `p-1 rounded-lg ${c.header?.closeBtnColor} ${c.header?.closeBtnHoverBg} transition-all focus:outline-none focus:ring-2 focus:ring-gray-200`,
+      closeButton: `p-1 rounded-lg ${c.header?.closeBtnColor} ${c.header?.closeBtnHoverBg} transition-all focus:outline-none focus:ring-2 focus:ring-[#0077be] focus:ring-offset-2 dark:focus:ring-offset-[#061a29]`,
       closeIcon: "h-5 w-5",
     },
     body: {

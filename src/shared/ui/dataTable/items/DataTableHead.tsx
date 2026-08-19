@@ -17,6 +17,7 @@ interface DataTableHeadProps<T> {
   onPin: (id: string, direction: PinDirection) => void;
   onResize: (id: string, width: number) => void;
   data: T[];
+  defaultOpenFilterColumn?: string;
 }
 
 const DataTableHeadInner = <T,>({
@@ -28,8 +29,18 @@ const DataTableHeadInner = <T,>({
   onPin,
   onResize,
   data,
+  defaultOpenFilterColumn,
 }: DataTableHeadProps<T>) => {
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [activeMenu, setActiveMenu] = useState<string | null>(() => {
+    if (defaultOpenFilterColumn) {
+      return defaultOpenFilterColumn;
+    }
+    const filterOpenCol = columns.find((c) => c.isFilterOpen);
+    if (filterOpenCol) {
+      return filterOpenCol.id;
+    }
+    return null;
+  });
 
   // Register animations once
   useEffect(() => {
@@ -64,7 +75,7 @@ const DataTableHeadInner = <T,>({
           <HeaderCell
             key={col.id}
             column={col}
-            isLast={idx === orderedColumns.length - 1}
+            isLast={idx === orderedColumns.length - 1 || !!col.isLast}
             isSecondToLast={idx === orderedColumns.length - 2}
             width={sizing[col.id] || col.width}
             isSorted={sorting.find((s) => s.id === col.id)}

@@ -19,16 +19,16 @@ export const dataTableStyles = {
     isSecondToLast?: boolean,
   ) => {
     return [
-      "flex items-center px-4 h-[44px] bg-[#ebf7ff]/95 dark:bg-[#041829]/95 box-border border-b border-[#004066]/15 dark:border-[#004066]/40",
+      "flex items-center px-4 h-[44px] bg-[#ebf7ff]/95 dark:bg-[#041829]/95 box-border border-b border-[#004066]/15 dark:border-[#004066]/40 shrink-0 grow",
       align === "center"
         ? "justify-center text-center"
         : align === "right"
           ? "justify-end text-right"
           : "justify-between text-left",
-      "text-[11px] font-bold uppercase tracking-wider text-[#004066] dark:text-[#90cdf4] select-none",
+      "text-xs font-semibold tracking-wide text-[#004066] dark:text-[#90cdf4] select-none",
       isPinned ? "sticky" : "relative",
       isSecondToLast
-        ? "flex-1 border-r border-[#004066]/15 dark:border-[#004066]/40"
+        ? "border-r border-[#004066]/15 dark:border-[#004066]/40"
         : isLast
           ? "border-r-0"
           : "border-r border-[#004066]/15 dark:border-[#004066]/40",
@@ -73,7 +73,7 @@ export const dataTableStyles = {
     isSelected?: boolean,
   ) => {
     return [
-      "flex items-center px-4 min-h-[52px] box-border text-[13px] text-[#004066] dark:text-[#ebf7ff] font-medium",
+      "flex items-center px-4 min-h-[52px] box-border text-[13px] text-[#004066] dark:text-[#ebf7ff] font-medium shrink-0 grow",
       isPinned ? "sticky z-[1]" : "relative z-0",
       isSelected
         ? "bg-[#0077be]/10 dark:bg-[#0077be]/20"
@@ -82,17 +82,17 @@ export const dataTableStyles = {
           : "bg-transparent",
       "dt-cell",
       isSecondToLast
-        ? "flex-1 border-r-transparent"
+        ? "border-r-transparent"
         : isLast
           ? "border-r-0"
           : isPinned
             ? "border-r border-[#004066]/15 dark:border-[#004066]/40"
             : "border-r-transparent",
       align === "center"
-        ? "justify-center"
+        ? "justify-center text-center"
         : align === "right"
-          ? "justify-end"
-          : "justify-start",
+          ? "justify-end text-right"
+          : "justify-start text-left",
     ].join(" ");
   },
 
@@ -123,7 +123,7 @@ export const dataTableStyles = {
       "flex items-center px-4 h-[40px] bg-[#ebf7ff]/80 dark:bg-[#041829]/80 box-border text-[12px] font-semibold text-[#004066] dark:text-[#ebf7ff]",
       isPinned ? "sticky z-[2] bg-[#ebf7ff]/90 dark:bg-[#041829]/90" : "relative z-[1]",
       isSecondToLast
-        ? "flex-1 border-r-transparent"
+        ? "border-r-transparent"
         : isLast
           ? "border-r-0"
           : isPinned

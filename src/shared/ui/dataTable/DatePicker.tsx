@@ -409,7 +409,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       >
         {label && (
           <label
-            className={`text-xs font-semibold text-text-secondary uppercase mb-1.5 flex items-center select-none ${
+            className={`text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1.5 flex items-center select-none ${
               labelClassName || ""
             }`}
           >

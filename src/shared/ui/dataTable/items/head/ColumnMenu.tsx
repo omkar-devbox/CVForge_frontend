@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   ChevronUp,
   ChevronDown,
@@ -38,6 +38,7 @@ export const ColumnMenu = <T,>({
   onClose,
   minWidth,
 }: ColumnMenuProps<T>) => {
+  const menuRef = useRef<HTMLDivElement>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(() => {
     const isSortable = "sortable" in column ? column.sortable !== false : false;
     if (isSortable) return "sort";
@@ -45,12 +46,35 @@ export const ColumnMenu = <T,>({
     return null;
   });
 
+  useEffect(() => {
+    const focusTargetInput = () => {
+      if (!menuRef.current) return;
+      const inputElem = menuRef.current.querySelector<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >("input:not([type='hidden']), select, textarea");
+      if (inputElem) {
+        inputElem.focus({ preventScroll: true });
+      }
+    };
+
+    focusTargetInput();
+    const rafId = requestAnimationFrame(focusTargetInput);
+    const timer1 = setTimeout(focusTargetInput, 20);
+    const timer2 = setTimeout(focusTargetInput, 100);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
+
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
   return (
-    <div className={styles.menu}>
+    <div ref={menuRef} className={styles.menu}>
       {/* Dynamic Custom Section (e.g. Filters) */}
       {"filterSectionRender" in column && column.filterSectionRender && (
         <div className="p-3 border-b border-slate-100">

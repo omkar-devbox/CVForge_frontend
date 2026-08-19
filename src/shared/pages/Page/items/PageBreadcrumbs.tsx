@@ -11,36 +11,45 @@ interface PageBreadcrumbsProps {
 export const PageBreadcrumbs: FC<PageBreadcrumbsProps> = ({ breadcrumbs }) => {
   const renderedBreadcrumbs = useMemo(
     () =>
-      breadcrumbs.map((bc, index) => (
-        <div key={`${bc.label}-${index}`} className={pageStyles.breadcrumbItem}>
-          <ChevronRight size={12} className={pageStyles.separator} />
-          {bc.path ? (
-            <Link to={bc.path} className="hover:text-primary transition-colors">
-              {bc.label}
-            </Link>
-          ) : bc.onClick ? (
-            <button
-              onClick={bc.onClick}
-              className="hover:text-primary transition-colors text-text-primary font-semibold focus:outline-none"
-            >
-              {bc.label}
-            </button>
-          ) : (
-            <span className="text-text-primary font-semibold">{bc.label}</span>
-          )}
-        </div>
-      )),
+      breadcrumbs.map((bc, index) => {
+        const isLast = index === breadcrumbs.length - 1;
+        return (
+          <div key={`${bc.label}-${index}`} className={pageStyles.breadcrumbItem}>
+            <ChevronRight className={pageStyles.separator} />
+            {bc.path ? (
+              <Link
+                to={bc.path}
+                className={isLast ? pageStyles.breadcrumbActive : pageStyles.breadcrumbLink}
+              >
+                {bc.label}
+              </Link>
+            ) : bc.onClick ? (
+              <button
+                onClick={bc.onClick}
+                className={`${isLast ? pageStyles.breadcrumbActive : pageStyles.breadcrumbLink} focus:outline-hidden`}
+              >
+                {bc.label}
+              </button>
+            ) : (
+              <span className={isLast ? pageStyles.breadcrumbActive : pageStyles.breadcrumbLink}>
+                {bc.label}
+              </span>
+            )}
+          </div>
+        );
+      }),
     [breadcrumbs],
   );
 
   if (breadcrumbs.length === 0) return null;
 
   return (
-    <nav className={pageStyles.nav}>
-      <Link to="/" className={pageStyles.homeIcon}>
-        <Home size={14} />
+    <nav className={pageStyles.nav} aria-label="Breadcrumb navigation">
+      <Link to="/" className={pageStyles.homeIcon} title="Home">
+        <Home className="w-3.5 h-3.5" />
       </Link>
       {renderedBreadcrumbs}
     </nav>
   );
 };
+

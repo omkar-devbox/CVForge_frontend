@@ -8,6 +8,7 @@ export interface Breadcrumb {
 
 export interface PageSearchConfig {
   placeholder?: string;
+  value?: string;
   onSearch: (value: string) => void;
 }
 

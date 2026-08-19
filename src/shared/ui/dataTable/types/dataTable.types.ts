@@ -45,6 +45,7 @@ type BaseColumn<T> = {
   resizable?: boolean;
   pinnable?: boolean;
   isFilter?: boolean;
+  isFilterOpen?: boolean;
   isLast?: boolean;
 };
 
@@ -251,4 +252,7 @@ export type DataTableProps<T> = {
     onPageChange: (page: number) => void; // 1-indexed
     onLimitChange: (limit: number) => void;
   };
+
+  /** Default column filter to open on mount */
+  defaultOpenFilterColumn?: string;
 };

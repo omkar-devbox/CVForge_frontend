@@ -95,6 +95,7 @@ export const DataTable = <T,>(props: DataTableProps<T>) => {
               onPin={actions.setColumnPinning}
               onResize={actions.setColumnSizing}
               data={props.data}
+              defaultOpenFilterColumn={props.defaultOpenFilterColumn}
             />
             <DataTableBody<T>
               data={paginatedData}

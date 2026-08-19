@@ -66,14 +66,23 @@ export const HeaderCell = <T,>({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!resizeRef.current) return;
+      const cellElem = resizeRef.current.parentElement;
+      if (!cellElem) return;
+
+      const containerElem = cellElem.closest(".isolate") || cellElem.closest("table") || document.body;
+      const containerWidth = containerElem.getBoundingClientRect().width;
+      const max30PercentWidth = Math.floor(containerWidth * 0.30);
+      const effectiveMaxWidth = column.maxWidth ?? max30PercentWidth;
+
       let newWidth = Math.max(
         minWidth,
-        e.clientX -
-        resizeRef.current.parentElement!.getBoundingClientRect().left,
+        e.clientX - cellElem.getBoundingClientRect().left,
       );
-      if (column.maxWidth) {
-        newWidth = Math.min(newWidth, column.maxWidth);
+
+      if (newWidth > effectiveMaxWidth) {
+        newWidth = effectiveMaxWidth;
       }
+
       onResize(column.id, newWidth);
     };
 
@@ -92,7 +101,7 @@ export const HeaderCell = <T,>({
     return () => {
       if (resizer) resizer.removeEventListener("mousedown", onMouseDown);
     };
-  }, [column.id, onResize, minWidth]);
+  }, [column.id, column.maxWidth, onResize, minWidth]);
 
   const { refs, floatingStyles } = useFloating({
     open: isMenuOpen,
@@ -114,6 +123,14 @@ export const HeaderCell = <T,>({
 
       // Ignore clicks inside the floating menu
       if (refs.floating.current && refs.floating.current.contains(target)) {
+        return;
+      }
+
+      // Ignore clicks on the reference element (filter button)
+      if (
+        refs.domReference.current &&
+        (refs.domReference.current as HTMLElement).contains(target)
+      ) {
         return;
       }
 
@@ -140,11 +157,16 @@ export const HeaderCell = <T,>({
   useEffect(() => {
     if (isMenuOpen) {
       const timer = setTimeout(() => {
-        inputRef.current?.focus({ preventScroll: true });
-      }, 10);
+        const inputElem = refs.floating.current?.querySelector<HTMLInputElement | HTMLSelectElement>(
+          "input, select, textarea"
+        );
+        if (inputElem) {
+          inputElem.focus({ preventScroll: true });
+        }
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isMenuOpen]);
+  }, [isMenuOpen, refs.floating]);
 
 
 
@@ -176,7 +198,7 @@ export const HeaderCell = <T,>({
       style={{
         width: `${width || minWidth}px`,
         minWidth: `${width || minWidth}px`,
-        maxWidth: column.maxWidth ? `${column.maxWidth}px` : undefined,
+        maxWidth: column.maxWidth ? `${column.maxWidth}px` : "30%",
         left: leftOffset !== undefined ? `${leftOffset}px` : undefined,
         right: rightOffset !== undefined ? `${rightOffset}px` : undefined,
       }}

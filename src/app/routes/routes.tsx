@@ -5,8 +5,11 @@ import { Loader2 } from "lucide-react";
 import { SIDEBAR_MENU } from "../menu/menuItems";
 
 // Lazy loading page components
-const ExcelDashboard = lazy(() => import("@/features/excel/ExcelDashboard"));
 const GenericPage = lazy(() => import("@/shared/pages/GenericPage/GenericPage"));
+const JobsPage = lazy(() => import("@/features/recruitment/jobs/jobs"));
+const ApplicationsPage = lazy(() => import("@/features/recruitment/applications/application"));
+const AllCandidatesPage = lazy(() => import("@/features/candidates/allcandidates/allcandidates"));
+const TalentPoolPage = lazy(() => import("@/features/candidates/talentpool/talentpool"));
 const UnauthorizedPage = lazy(() =>
   import("@/shared/pages/unauthorized/UnauthorizedPage")
 );
@@ -71,32 +74,98 @@ export function AppRouter() {
         <Route
           path="/"
           element={
-            <MainLayout pageTitle="Excel Intelligence & AI Modifier" pageSubtitle="Deep openpyxl analysis & LLM automation">
-              <ExcelDashboard />
+            <MainLayout pageTitle="Dashboard" pageSubtitle="Overview & Analytics Dashboard">
+              <GenericPage />
             </MainLayout>
           }
         />
         <Route
           path="/dashboard"
           element={
-            <MainLayout pageTitle="Excel Intelligence & AI Modifier" pageSubtitle="Deep openpyxl analysis & LLM automation">
-              <ExcelDashboard />
+            <MainLayout pageTitle="Dashboard" pageSubtitle="Overview & Analytics Dashboard">
+              <GenericPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Recruitment Jobs Route */}
+        <Route
+          path="/recruitment/jobs"
+          element={
+            <MainLayout pageTitle="Jobs" pageSubtitle="Manage Job Openings & Hiring Pipeline">
+              <JobsPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Recruitment Applications Route */}
+        <Route
+          path="/recruitment/applications"
+          element={
+            <MainLayout pageTitle="Applications" pageSubtitle="Candidate Applications & Hiring Stages">
+              <ApplicationsPage />
+            </MainLayout>
+          }
+        />
+
+        {/* All Candidates Routes */}
+        <Route
+          path="/candidates/all"
+          element={
+            <MainLayout pageTitle="All Candidates" pageSubtitle="Manage Candidate Profiles & Talent Database">
+              <AllCandidatesPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/candidates/allcandidates"
+          element={
+            <MainLayout pageTitle="All Candidates" pageSubtitle="Manage Candidate Profiles & Talent Database">
+              <AllCandidatesPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Talent Pool Routes */}
+        <Route
+          path="/candidates/talent-pool"
+          element={
+            <MainLayout pageTitle="Talent Pool" pageSubtitle="Curate, organize, and fast-track high-potential pre-vetted candidates">
+              <TalentPoolPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/candidates/talentpool"
+          element={
+            <MainLayout pageTitle="Talent Pool" pageSubtitle="Curate, organize, and fast-track high-potential pre-vetted candidates">
+              <TalentPoolPage />
             </MainLayout>
           }
         />
 
         {/* Dynamic Sidebar Module & Settings Routes */}
-        {moduleRoutes.map((route) => (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={
-              <MainLayout pageTitle={route.title} pageSubtitle={route.subtitle}>
-                <GenericPage />
-              </MainLayout>
-            }
-          />
-        ))}
+        {moduleRoutes
+          .filter(
+            (route) =>
+              route.path !== "/recruitment/jobs" &&
+              route.path !== "/recruitment/applications" &&
+              route.path !== "/candidates/all" &&
+              route.path !== "/candidates/allcandidates" &&
+              route.path !== "/candidates/talent-pool" &&
+              route.path !== "/candidates/talentpool"
+          )
+          .map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <MainLayout pageTitle={route.title} pageSubtitle={route.subtitle}>
+                  <GenericPage />
+                </MainLayout>
+              }
+            />
+          ))}
 
         {/* Unauthorized Route */}
         <Route
