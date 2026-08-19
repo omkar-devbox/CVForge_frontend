@@ -11,7 +11,6 @@ import {
   Settings,
   UserCog,
   ShieldCheck,
-  Mail,
 } from "lucide-react";
 import type { MenuSection, MenuItem } from "@/shared/nav/Sidebar/types/types";
 
@@ -150,14 +149,6 @@ export const SIDEBAR_MENU: MenuSection[] = [
             icon: ShieldCheck,
             path: "/settings/roles-permissions",
             tooltip: "Access Control & Permissions",
-          },
-          {
-            id: "settings-email-templates",
-            key: "email-templates",
-            label: "Email Templates",
-            icon: Mail,
-            path: "/settings/email-templates",
-            tooltip: "Recruitment & Notification Email Templates",
           },
         ],
       },

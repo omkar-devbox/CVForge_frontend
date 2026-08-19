@@ -275,64 +275,6 @@ export const RolesAndPermissionsPage: React.FC = () => {
         </div>
       }
     >
-      {/* Metric Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-            <Shield size={20} />
-          </div>
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">
-              Total Configured Roles
-            </span>
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              {metrics.totalRoles}
-            </span>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
-            <Lock size={20} />
-          </div>
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">
-              Built-in System Roles
-            </span>
-            <span className="text-xl font-bold text-purple-600 dark:text-purple-400">
-              {metrics.systemRolesCount}
-            </span>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
-            <Sparkles size={20} />
-          </div>
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">
-              Custom Created Roles
-            </span>
-            <span className="text-xl font-bold text-cyan-600 dark:text-cyan-400">
-              {metrics.customRolesCount}
-            </span>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-            <Users size={20} />
-          </div>
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">
-              Protected Organization Members
-            </span>
-            <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-              {metrics.activeMembersAssigned}
-            </span>
-          </div>
-        </div>
-      </div>
 
       {/* Tab Sub-Navigation */}
       <div className="flex items-center gap-2 mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
