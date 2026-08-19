@@ -133,7 +133,11 @@ const DataTableCellInner = <T,>({
       style={{
         width: `${width || 150}px`,
         minWidth: `${width || 150}px`,
-        maxWidth: column.maxWidth ? `${column.maxWidth}px` : "30%",
+        maxWidth: column.maxWidth
+          ? `${column.maxWidth}px`
+          : column.resizable === false && (width || column.width)
+            ? `${width || column.width}px`
+            : "30%",
         left: leftOffset !== undefined ? `${leftOffset}px` : undefined,
         right: rightOffset !== undefined ? `${rightOffset}px` : undefined,
       }}

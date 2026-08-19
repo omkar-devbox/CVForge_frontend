@@ -11,6 +11,10 @@ const ApplicationsPage = lazy(() => import("@/features/recruitment/applications/
 const AllCandidatesPage = lazy(() => import("@/features/candidates/allcandidates/allcandidates"));
 const TalentPoolPage = lazy(() => import("@/features/candidates/talentpool/talentpool"));
 const UpcomingInterviewsPage = lazy(() => import("@/features/interviews/upcoming/upcoming"));
+const CompletedInterviewsPage = lazy(() => import("@/features/interviews/completed/completed"));
+const ReportsPage = lazy(() => import("@/features/reports/reports"));
+const SettingsUsersPage = lazy(() => import("@/features/settings/users/users"));
+const SettingsRolesPage = lazy(() => import("@/features/settings/rolesandpermissions/rolesandpermissions"));
 const UnauthorizedPage = lazy(() =>
   import("@/shared/pages/unauthorized/UnauthorizedPage")
 );
@@ -155,6 +159,54 @@ export function AppRouter() {
           }
         />
 
+        {/* Completed Interviews Route */}
+        <Route
+          path="/interviews/completed"
+          element={
+            <MainLayout pageTitle="Completed Interviews" pageSubtitle="Review interview scorecards, candidate evaluations, and hiring recommendations">
+              <CompletedInterviewsPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Reports Route */}
+        <Route
+          path="/reports"
+          element={
+            <MainLayout pageTitle="Reports" pageSubtitle="Analytics, Metrics & Hiring Pipeline Performance Reports">
+              <ReportsPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Settings / Users Route */}
+        <Route
+          path="/settings/users"
+          element={
+            <MainLayout pageTitle="User Management" pageSubtitle="Manage organization team members, access permissions, and security">
+              <SettingsUsersPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Settings / Roles & Permissions Route */}
+        <Route
+          path="/settings/roles-permissions"
+          element={
+            <MainLayout pageTitle="Roles & Permissions" pageSubtitle="Manage access control, permission matrices, and user security policies">
+              <SettingsRolesPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/settings/rolesandpermissions"
+          element={
+            <MainLayout pageTitle="Roles & Permissions" pageSubtitle="Manage access control, permission matrices, and user security policies">
+              <SettingsRolesPage />
+            </MainLayout>
+          }
+        />
+
         {/* Dynamic Sidebar Module & Settings Routes */}
         {moduleRoutes
           .filter(
@@ -165,7 +217,12 @@ export function AppRouter() {
               route.path !== "/candidates/allcandidates" &&
               route.path !== "/candidates/talent-pool" &&
               route.path !== "/candidates/talentpool" &&
-              route.path !== "/interviews/upcoming"
+              route.path !== "/interviews/upcoming" &&
+              route.path !== "/interviews/completed" &&
+              route.path !== "/reports" &&
+              route.path !== "/settings/users" &&
+              route.path !== "/settings/roles-permissions" &&
+              route.path !== "/settings/rolesandpermissions"
           )
           .map((route) => (
             <Route

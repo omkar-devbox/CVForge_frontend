@@ -119,6 +119,11 @@ export interface AiSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   resizable?: boolean;
+  side?: "left" | "right";
+  defaultWidth?: number;
+  minWidth?: number;
+  maxWidth?: number;
+  storageKey?: string;
   styleConfig?: AiStyleConfig;
 }
 

@@ -222,6 +222,8 @@ export function useDataTable<T>(props: DataTableProps<T>) {
           id: "select",
           label: "",
           width: 48,
+          minWidth: 48,
+          maxWidth: 48,
           align: "center",
           headerAlign: "center",
           resizable: false,

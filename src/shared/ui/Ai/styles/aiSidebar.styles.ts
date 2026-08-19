@@ -4,21 +4,26 @@ import { cn } from "@/shared/lib/utils";
  * Main AI Sidebar Container Styles
  */
 export const aiSidebarStyles = {
-  aside: (isResizing: boolean) =>
+  aside: (isResizing: boolean, side: "left" | "right" = "right") =>
     cn(
-      "h-screen bg-[#ebf7ff] dark:bg-[#03131e] border-l border-[#004066]/15 dark:border-[#004066]/40 flex flex-col shrink-0 overflow-visible isolate",
-      !isResizing && "transition-all duration-300 ease-in-out",
-      "fixed right-0 top-0 z-50",
+      "h-screen bg-[#ebf7ff] dark:bg-[#03131e] flex flex-col shrink-0 overflow-hidden isolate z-30 transform-gpu will-change-[width,opacity]",
+      "lg:relative lg:top-auto lg:h-full lg:z-auto",
+      "max-lg:fixed max-lg:top-0 max-lg:z-50",
+      side === "left"
+        ? "left-0 border-r border-[#004066]/15 dark:border-[#004066]/40"
+        : "right-0 border-l border-[#004066]/15 dark:border-[#004066]/40",
     ),
-  resizeHandle: (isResizing: boolean) =>
+  resizeHandle: (isResizing: boolean, side: "left" | "right" = "right") =>
     cn(
-      "absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 group hidden lg:block",
+      "absolute top-0 bottom-0 w-1.5 cursor-col-resize z-50 group hidden lg:block",
+      side === "left" ? "right-0" : "left-0",
       "hover:bg-[#0077be]/20 transition-colors",
       isResizing && "bg-[#0077be]/30 w-1.5",
     ),
-  resizeIndicator: (isResizing: boolean) =>
+  resizeIndicator: (isResizing: boolean, side: "left" | "right" = "right") =>
     cn(
-      "absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-10 rounded-full bg-[#004066]/30 dark:bg-[#ebf7ff]/30 transition-all",
+      "absolute top-1/2 -translate-y-1/2 w-[2px] h-10 rounded-full bg-[#004066]/30 dark:bg-[#ebf7ff]/30 transition-all",
+      side === "left" ? "right-0" : "left-0",
       isResizing
         ? "bg-[#0077be] h-full"
         : "group-hover:bg-[#0077be] group-hover:h-12",

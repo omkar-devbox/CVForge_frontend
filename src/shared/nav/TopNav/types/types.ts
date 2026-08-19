@@ -49,6 +49,8 @@ export interface TopNavProps {
   collapsed?: boolean;
   onToggleSidebar?: () => void;
   onMobileMenuOpen?: () => void;
+  onToggleAi?: () => void;
+  isAiOpen?: boolean;
   onLogout?: () => void;
   className?: string;
   styleConfig?: TopNavStyleConfig;

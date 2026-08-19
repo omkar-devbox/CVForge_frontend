@@ -42,6 +42,9 @@ export const calculateColumnMinWidth = <T,>(
   column: ColumnDef<T>,
   data: T[],
 ): number => {
+  if (column.id === "select" || column.id === "selection") {
+    return column.width || 48;
+  }
   if (
     column.width !== undefined &&
     column.width > 0
@@ -67,6 +70,9 @@ export const calculateColumnContentWidth = <T,>(
   column: ColumnDef<T>,
   data: T[],
 ): number => {
+  if (column.id === "select" || column.id === "selection") {
+    return column.width || 48;
+  }
   // --------------------------------------------------
   // Canvas setup
   // --------------------------------------------------

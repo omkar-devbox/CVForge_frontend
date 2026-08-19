@@ -12,4 +12,5 @@ export * from "./loading";
 export * from "../nav";
 export * from "./Badge";
 export * from "./Modal";
+export * from "./Ai";
 

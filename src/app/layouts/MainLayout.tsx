@@ -1,6 +1,6 @@
 import { useState, type FC, type ReactNode } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { Sidebar, TopNav } from "@/shared/ui";
+import { Sidebar, TopNav, AiSidebar } from "@/shared/ui";
 import { local } from "@/shared/lib/Storage/localstorage";
 
 // ==================== Main Layout ====================
@@ -33,6 +33,7 @@ export const MainLayout: FC<MainLayoutProps> = ({
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(false);
 
   // Clear local session data and redirect the user after logout.
   const handleLogout = () => {
@@ -58,9 +59,9 @@ export const MainLayout: FC<MainLayoutProps> = ({
 
   return (
     // ==================== Application Shell ====================
-    <div className="h-screen w-screen bg-[#ebf7ff] dark:bg-[#03131e] text-[#004066] dark:text-[#ebf7ff] flex flex-row overflow-hidden font-sans antialiased selection:bg-[#0077be] selection:text-white">
+    <div className="h-screen w-screen bg-[#ebf7ff] dark:bg-[#03131e] text-[#004066] dark:text-[#ebf7ff] flex flex-row overflow-hidden font-sans antialiased selection:bg-[#0077be] selection:text-white relative">
 
-      {/* ==================== Sidebar ==================== */}
+      {/* ==================== Navigation Sidebar ==================== */}
       <Sidebar
         collapsed={collapsed}
         setCollapsed={setCollapsed}
@@ -79,7 +80,7 @@ export const MainLayout: FC<MainLayoutProps> = ({
       />
 
       {/* ==================== Main Content ==================== */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
         {/* ==================== Top Navigation ==================== */}
         <TopNav
@@ -94,6 +95,8 @@ export const MainLayout: FC<MainLayoutProps> = ({
           collapsed={collapsed}
           onToggleSidebar={() => setCollapsed((prev) => !prev)}
           onMobileMenuOpen={() => setIsMobileOpen(true)}
+          onToggleAi={() => setIsAiOpen((prev) => !prev)}
+          isAiOpen={isAiOpen}
           onLogout={handleLogout}
         />
 
@@ -104,6 +107,14 @@ export const MainLayout: FC<MainLayoutProps> = ({
           </div>
         </main>
       </div>
+
+      {/* ==================== AI Component Sidebar (Right Side - Flex Layout Shift) ==================== */}
+      <AiSidebar
+        isOpen={isAiOpen}
+        onClose={() => setIsAiOpen(false)}
+        side="right"
+        resizable={true}
+      />
     </div>
   );
 };
