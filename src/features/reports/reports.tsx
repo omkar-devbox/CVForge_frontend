@@ -1,19 +1,13 @@
 import React, { useState, useMemo } from "react";
 import {
-  BarChart3,
   Filter,
-  DollarSign,
   Clock,
   FileText,
-  Sparkles,
-  Download,
-  CheckCircle2,
 } from "lucide-react";
 import { Page } from "@/shared/pages/Page/Page";
 import { toast } from "@/shared/ui/toast";
 import { ReportsHeaderStats } from "./items/ReportsHeaderStats";
 import { ReportsFilters } from "./items/ReportsFilters";
-import { AiReportsInsights } from "./items/AiReportsInsights";
 import { RecruitmentFunnelChart } from "./items/RecruitmentFunnelChart";
 import { SourcingChannelRoiTable } from "./items/SourcingChannelRoiTable";
 import { TimeToHireChart } from "./items/TimeToHireChart";
@@ -27,7 +21,6 @@ import {
   INITIAL_SOURCING_CHANNELS,
   INITIAL_DEPT_TIME_TO_HIRE,
   INITIAL_SCHEDULED_REPORTS,
-  INITIAL_AI_INSIGHTS,
 } from "./data/mockReportsData";
 
 import type {
@@ -44,7 +37,6 @@ export const ReportsPage: React.FC = () => {
   const [sourcingChannels] = useState(INITIAL_SOURCING_CHANNELS);
   const [deptTimeToHire] = useState(INITIAL_DEPT_TIME_TO_HIRE);
   const [scheduledReports, setScheduledReports] = useState<ScheduledReport[]>(INITIAL_SCHEDULED_REPORTS);
-  const [aiInsights] = useState(INITIAL_AI_INSIGHTS);
 
   // Filters State
   const [filters, setFilters] = useState<ReportsFilterState>({
@@ -146,9 +138,6 @@ export const ReportsPage: React.FC = () => {
         onOpenCreateModal={() => setIsCreateModalOpen(true)}
         onExport={handleExportData}
       />
-
-      {/* AI Hiring Insights Banner */}
-      <AiReportsInsights insights={aiInsights} />
 
       {/* Navigation Tabs */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 mb-6">

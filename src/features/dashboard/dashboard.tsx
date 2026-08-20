@@ -10,7 +10,6 @@ import { toast } from "@/shared/ui/toast";
 import { useNavigate } from "react-router-dom";
 
 import { DashboardHeaderStats } from "./items/DashboardHeaderStats";
-import { AiDashboardInsights } from "./items/AiDashboardInsights";
 import { DashboardFunnelOverview } from "./items/DashboardFunnelOverview";
 import { UpcomingInterviewsWidget } from "./items/UpcomingInterviewsWidget";
 import { RecentApplicationsTable } from "./items/RecentApplicationsTable";
@@ -18,7 +17,6 @@ import { TopJobsWidget } from "./items/TopJobsWidget";
 
 import {
   MOCK_KPI_METRICS,
-  MOCK_AI_INSIGHTS,
   MOCK_FUNNEL_STAGES,
   MOCK_TODAYS_INTERVIEWS,
   MOCK_RECENT_APPLICATIONS,
@@ -96,9 +94,6 @@ export const DashboardPage: React.FC = () => {
     >
       {/* 1. KPI Header Metric Cards */}
       <DashboardHeaderStats metrics={MOCK_KPI_METRICS} />
-
-      {/* 2. AI Intelligence Hub Insights */}
-      <AiDashboardInsights insights={MOCK_AI_INSIGHTS} />
 
       {/* 3. Main Grid: Funnel Overview & Today's Scheduled Interviews */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

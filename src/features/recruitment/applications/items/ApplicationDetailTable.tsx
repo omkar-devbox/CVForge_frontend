@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { DataTable, ColumnDef, FormField } from "@/shared/ui";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/button";
@@ -8,6 +8,8 @@ import {
   Trash2,
   ChevronDown,
   CheckCircle2,
+  AlertCircle,
+  XCircle,
   FileText,
   Download,
   Star,
@@ -15,17 +17,20 @@ import {
   Phone,
   Mail,
   Building2,
+  Check,
+  UserCheck,
 } from "lucide-react";
 import type {
   CandidateApplication,
   ApplicationStage,
   ApplicationStatus,
+  EligibilityStatus,
 } from "../types/application.types";
 
 export interface ApplicationDetailTableProps {
   applications: CandidateApplication[];
   onSelectApplication: (app: CandidateApplication) => void;
-  onEditApplication: (app: CandidateApplication) => void;
+  onEditApplication?: (app: CandidateApplication) => void;
   onDownloadResume?: (app: CandidateApplication) => void;
   onDeleteApplication: (appId: string, name: string) => void;
   onBulkDelete?: (appIds: (string | number)[]) => void;
@@ -39,7 +44,7 @@ export interface ApplicationDetailTableProps {
 }
 
 /* =========================================================
-   🔹 HELPER FUNCTIONS & CELL COMPONENTS
+   🔹 HELPER FUNCTIONS & BADGES
 ========================================================= */
 
 import type { BadgeVariant } from "@/shared/ui/Badge/style/style";
@@ -63,21 +68,38 @@ const getStageBadgeVariant = (stage: ApplicationStage): BadgeVariant => {
   }
 };
 
-const getStatusBadgeVariant = (status: ApplicationStatus): BadgeVariant => {
+const getEligibilityBadgeProps = (status?: EligibilityStatus) => {
   switch (status) {
-    case "Active":
-    case "Shortlisted":
-      return "success";
-    case "In Review":
-      return "info";
-    case "On Hold":
-      return "warning";
-    case "Hired":
-      return "success";
-    case "Rejected":
-      return "danger";
+    case "Highly Qualified":
+      return {
+        variant: "success" as const,
+        label: "Highly Qualified",
+        classes: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800",
+      };
+    case "Eligible":
+      return {
+        variant: "info" as const,
+        label: "Eligible",
+        classes: "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800",
+      };
+    case "Partially Eligible":
+      return {
+        variant: "warning" as const,
+        label: "Partial Match",
+        classes: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800",
+      };
+    case "Not Eligible":
+      return {
+        variant: "danger" as const,
+        label: "Not Eligible",
+        classes: "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
+      };
     default:
-      return "default";
+      return {
+        variant: "default" as const,
+        label: "Under Review",
+        classes: "text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700",
+      };
   }
 };
 
@@ -99,6 +121,10 @@ const STATUS_OPTIONS: ApplicationStatus[] = [
   "Rejected",
 ];
 
+/* =========================================================
+   🔹 TABLE CELLS
+========================================================= */
+
 interface CandidateCellProps {
   app: CandidateApplication;
   onSelectApplication: (app: CandidateApplication) => void;
@@ -113,22 +139,33 @@ const CandidateCell: React.FC<CandidateCellProps> = ({ app, onSelectApplication 
 
   return (
     <div
-      className="flex items-center gap-3 py-1 cursor-pointer group"
+      className="flex items-start gap-3 py-1.5 cursor-pointer group max-w-sm"
       onClick={() => onSelectApplication(app)}
     >
-      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs mt-0.5">
         {initials}
       </div>
-      <div className="min-w-0">
-        <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm break-words whitespace-normal leading-snug">
-          {app.candidateName}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm break-words whitespace-normal leading-snug">
+            {app.candidateName}
+          </span>
+          <span className="text-2xs text-slate-500 dark:text-slate-400 font-normal">
+            ({app.experienceYears}y exp)
+          </span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-normal">
-          <span className="flex items-center gap-1">
-            <Mail className="w-3 h-3 text-slate-400" />
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <span className="flex items-center gap-1 truncate">
+            <Mail className="w-3 h-3 text-slate-400 shrink-0" />
             {app.candidateEmail}
           </span>
         </div>
+        {/* Brief info snippet */}
+        {app.briefInfo && (
+          <p className="text-2xs text-slate-600 dark:text-slate-300 mt-1 line-clamp-1 leading-snug bg-slate-50 dark:bg-slate-800/60 px-1.5 py-0.5 rounded border border-slate-200/60 dark:border-slate-700/60">
+            {app.briefInfo}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -168,14 +205,14 @@ const StageCell: React.FC<StageCellProps> = ({
         <button
           type="button"
           onClick={() => onToggleMenu(isOpen ? null : `stage-${app.id}`)}
-          className="inline-flex items-center focus:outline-hidden"
+          className="inline-flex items-center focus:outline-hidden cursor-pointer"
         >
           <Badge
             variant={getStageBadgeVariant(app.stage)}
             size="sm"
             rounded
             dot
-            className="cursor-pointer hover:opacity-90 transition-opacity"
+            className="hover:opacity-90 transition-opacity"
           >
             {app.stage}
             <ChevronDown className="w-3 h-3 ml-1 inline-block opacity-70" />
@@ -191,7 +228,7 @@ const StageCell: React.FC<StageCellProps> = ({
                   onStageChange(app.id, stg);
                   onToggleMenu(null);
                 }}
-                className={`w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center justify-between transition-colors ${
+                className={`w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center justify-between transition-colors cursor-pointer ${
                   app.stage === stg
                     ? "font-medium text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
                     : "text-slate-700 dark:text-slate-300"
@@ -215,23 +252,81 @@ const StageCell: React.FC<StageCellProps> = ({
 );
 
 interface MatchScoreCellProps {
-  score: number;
+  app: CandidateApplication;
+  onSelectApplication: (app: CandidateApplication) => void;
 }
 
-const MatchScoreCell: React.FC<MatchScoreCellProps> = ({ score }) => {
-  let color = "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
+const MatchScoreCell: React.FC<MatchScoreCellProps> = ({ app, onSelectApplication }) => {
+  const score = app.matchScore;
+  const eligibility = getEligibilityBadgeProps(app.eligibilityStatus);
+  const match = app.matchBreakdown;
+
+  let scoreColor = "text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800";
+  let barColor = "bg-emerald-600 dark:bg-emerald-400";
   if (score < 75) {
-    color = "text-amber-600 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800";
+    scoreColor = "text-amber-700 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200 dark:border-amber-800";
+    barColor = "bg-amber-500";
   } else if (score < 65) {
-    color = "text-red-600 bg-red-50 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-800";
+    scoreColor = "text-red-700 bg-red-50 dark:bg-red-950/50 dark:text-red-300 border-red-200 dark:border-red-800";
+    barColor = "bg-red-500";
   }
 
   return (
-    <div className="flex items-center gap-1.5 py-1">
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold border ${color}`}>
-        <Sparkles className="w-3 h-3" />
-        {score}%
-      </span>
+    <div
+      className="py-1 cursor-pointer group min-w-[140px]"
+      onClick={() => onSelectApplication(app)}
+    >
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold border shadow-2xs ${scoreColor}`}>
+          <Sparkles className="w-3 h-3" />
+          {score}% Match
+        </span>
+        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-2xs font-semibold border ${eligibility.classes}`}>
+          {eligibility.label}
+        </span>
+      </div>
+
+      {/* Mini Progress Bar */}
+      <div className="w-28 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+        <div
+          className={`h-1.5 rounded-full ${barColor}`}
+          style={{ width: `${score}%` }}
+        />
+      </div>
+
+      {/* Sub metrics preview */}
+      <div className="flex items-center gap-2 text-2xs text-slate-500 dark:text-slate-400 mt-1">
+        <span>Skills: <strong className="text-slate-700 dark:text-slate-300">{match?.skillsMatch || score}%</strong></span>
+        <span>•</span>
+        <span>Exp: <strong className="text-slate-700 dark:text-slate-300">{match?.experienceMatch || 90}%</strong></span>
+      </div>
+    </div>
+  );
+};
+
+interface SkillsCellProps {
+  app: CandidateApplication;
+}
+
+const SkillsCell: React.FC<SkillsCellProps> = ({ app }) => {
+  const displayedSkills = app.skills.slice(0, 3);
+  const remainingCount = app.skills.length - 3;
+
+  return (
+    <div className="flex flex-wrap gap-1 py-1 max-w-[200px]">
+      {displayedSkills.map((skill) => (
+        <span
+          key={skill}
+          className="px-2 py-0.5 rounded text-2xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700"
+        >
+          {skill}
+        </span>
+      ))}
+      {remainingCount > 0 && (
+        <span className="px-1.5 py-0.5 rounded text-2xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+          +{remainingCount}
+        </span>
+      )}
     </div>
   );
 };
@@ -239,7 +334,7 @@ const MatchScoreCell: React.FC<MatchScoreCellProps> = ({ score }) => {
 interface ApplicationActionsCellProps {
   app: CandidateApplication;
   onSelectApplication: (app: CandidateApplication) => void;
-  onEditApplication: (app: CandidateApplication) => void;
+  onEditApplication?: (app: CandidateApplication) => void;
   onDownloadResume?: (app: CandidateApplication) => void;
   onDeleteApplication: (appId: string, name: string) => void;
 }
@@ -256,20 +351,10 @@ const ApplicationActionsCell: React.FC<ApplicationActionsCellProps> = ({
       size="sm"
       variant="ghost"
       onClick={() => onSelectApplication(app)}
-      title="View Application Details"
-      className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+      title="View Resume Match & In-Depth Details"
+      className="h-8 w-8 p-0 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors"
     >
       <Eye className="w-4 h-4" />
-    </Button>
-
-    <Button
-      size="sm"
-      variant="ghost"
-      onClick={() => onEditApplication(app)}
-      title="Edit Application"
-      className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-    >
-      <Edit3 className="w-4 h-4" />
     </Button>
 
     {onDownloadResume && (
@@ -281,6 +366,18 @@ const ApplicationActionsCell: React.FC<ApplicationActionsCellProps> = ({
         className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
       >
         <Download className="w-4 h-4" />
+      </Button>
+    )}
+
+    {onEditApplication && (
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => onEditApplication(app)}
+        title="Edit Application"
+        className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+      >
+        <Edit3 className="w-4 h-4" />
       </Button>
     )}
 
@@ -296,12 +393,16 @@ const ApplicationActionsCell: React.FC<ApplicationActionsCellProps> = ({
   </div>
 );
 
+/* =========================================================
+   🔹 MOBILE CARD
+========================================================= */
+
 interface ApplicationCardProps {
   app: CandidateApplication;
   isSelected?: boolean;
   selectable?: boolean;
   onSelectApplication: (app: CandidateApplication) => void;
-  onEditApplication: (app: CandidateApplication) => void;
+  onEditApplication?: (app: CandidateApplication) => void;
   onDeleteApplication: (appId: string, name: string) => void;
 }
 
@@ -312,84 +413,105 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
   onSelectApplication,
   onEditApplication,
   onDeleteApplication,
-}) => (
-  <div
-    className={`p-4 bg-white dark:bg-slate-900 border ${
-      isSelected
-        ? "border-blue-500 ring-1 ring-blue-500/50 dark:border-blue-500"
-        : "border-slate-200 dark:border-slate-800"
-    } rounded-xl space-y-3 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors`}
-  >
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex items-start gap-3 min-w-0">
-        {selectable && (
-          <div className="pt-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-            <input
-              type="checkbox"
-              checked={isSelected}
-              readOnly
-              className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
-            />
+}) => {
+  const eligibility = getEligibilityBadgeProps(app.eligibilityStatus);
+
+  return (
+    <div
+      className={`p-4 bg-white dark:bg-slate-900 border ${
+        isSelected
+          ? "border-blue-500 ring-1 ring-blue-500/50 dark:border-blue-500"
+          : "border-slate-200 dark:border-slate-800"
+      } rounded-xl space-y-3 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
+          {selectable && (
+            <div className="pt-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                readOnly
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+              />
+            </div>
+          )}
+          <div className="min-w-0">
+            <h4
+              className="font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer text-sm"
+              onClick={() => onSelectApplication(app)}
+            >
+              {app.candidateName}
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {app.jobTitle} • {app.experienceYears} yrs exp
+            </p>
           </div>
-        )}
-        <div className="min-w-0">
-          <h4
-            className="font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer text-sm"
-            onClick={() => onSelectApplication(app)}
-          >
-            {app.candidateName}
-          </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {app.jobTitle} • {app.experienceYears} yrs exp
-          </p>
+        </div>
+        <Badge variant={getStageBadgeVariant(app.stage)} size="sm" rounded dot>
+          {app.stage}
+        </Badge>
+      </div>
+
+      {/* Brief Info */}
+      {app.briefInfo && (
+        <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg border border-slate-100 dark:border-slate-800 leading-relaxed">
+          {app.briefInfo}
+        </p>
+      )}
+
+      {/* Match Score & Eligibility */}
+      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
+        <span className="text-slate-500">AI Resume Match:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="font-bold text-emerald-600 dark:text-emerald-400">
+            {app.matchScore}%
+          </span>
+          <span className={`px-1.5 py-0.5 rounded text-2xs font-semibold border ${eligibility.classes}`}>
+            {eligibility.label}
+          </span>
         </div>
       </div>
-      <Badge variant={getStageBadgeVariant(app.stage)} size="sm" rounded dot>
-        {app.stage}
-      </Badge>
-    </div>
 
-    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-      <span>Match Score</span>
-      <MatchScoreCell score={app.matchScore} />
-    </div>
-
-    <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-      <span className="text-xs text-slate-500 dark:text-slate-400">
-        Applied {app.appliedDate}
-      </span>
-      <div className="flex items-center gap-1">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => onSelectApplication(app)}
-          className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-          title="View Details"
-        >
-          <Eye className="w-3.5 h-3.5" />
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => onEditApplication(app)}
-          className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-          title="Edit"
-        >
-          <Edit3 className="w-3.5 h-3.5" />
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => onDeleteApplication(app.id, app.candidateName)}
-          className="h-7 w-7 p-0 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400"
-          title="Delete"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </Button>
+      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          Applied {app.appliedDate}
+        </span>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => onSelectApplication(app)}
+            className="h-7 w-7 p-0 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+            title="View Details"
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </Button>
+          {onEditApplication && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onEditApplication(app)}
+              className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              title="Edit"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => onDeleteApplication(app.id, app.candidateName)}
+            className="h-7 w-7 p-0 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400"
+            title="Delete"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface EmptyApplicationsViewProps {
   onResetFilters?: () => void;
@@ -404,7 +526,7 @@ const EmptyApplicationsView: React.FC<EmptyApplicationsViewProps> = ({ onResetFi
       No Candidate Applications Found
     </h3>
     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
-      No applications matched your search criteria, stage, or status filter. Try resetting filters or add a new candidate application.
+      No applications matched your search criteria, stage, or eligibility filter. Try resetting filters.
     </p>
     {onResetFilters && (
       <Button onClick={onResetFilters} variant="outline" size="sm" className="mt-4">
@@ -444,25 +566,39 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
     jobTitle: "",
     stage: "",
     status: "",
-    matchScore: "",
-    appliedDate: "",
   });
 
-  const handleColumnFilterChange = useCallback((columnId: string, value: string) => {
+  const activeSelection = selectedAppIds !== undefined ? selectedAppIds : internalSelection;
+
+  const handleSelectionChange = useCallback(
+    (newSelectedIds: (string | number)[]) => {
+      setInternalSelection(newSelectedIds);
+      if (onSelectionChange) {
+        onSelectionChange(newSelectedIds);
+      }
+    },
+    [onSelectionChange]
+  );
+
+  const handleToggleMenu = useCallback((id: string | null) => {
+    setActiveMenuId((prev) => (prev === id ? null : id));
+  }, []);
+
+  const handleColumnFilterChange = useCallback((colKey: string, value: string) => {
     setColumnFilters((prev) => ({
       ...prev,
-      [columnId]: value,
+      [colKey]: value,
     }));
   }, []);
 
-  const handleClearColumnFilter = useCallback((columnId: string) => {
+  const handleClearColumnFilter = useCallback((colKey: string) => {
     setColumnFilters((prev) => ({
       ...prev,
-      [columnId]: "",
+      [colKey]: "",
     }));
   }, []);
 
-  // Filter applications by column search filters
+  // Filter applications by active column filters
   const displayApplications = useMemo(() => {
     return applications.filter((app) => {
       if (
@@ -482,26 +618,7 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
       if (
         columnFilters.stage &&
         columnFilters.stage !== "All" &&
-        !app.stage.toLowerCase().includes(columnFilters.stage.toLowerCase())
-      ) {
-        return false;
-      }
-      if (
-        columnFilters.status &&
-        columnFilters.status !== "All" &&
-        !app.status.toLowerCase().includes(columnFilters.status.toLowerCase())
-      ) {
-        return false;
-      }
-      if (
-        columnFilters.matchScore &&
-        !String(app.matchScore).includes(columnFilters.matchScore)
-      ) {
-        return false;
-      }
-      if (
-        columnFilters.appliedDate &&
-        !app.appliedDate.toLowerCase().includes(columnFilters.appliedDate.toLowerCase())
+        app.stage !== columnFilters.stage
       ) {
         return false;
       }
@@ -509,42 +626,12 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
     });
   }, [applications, columnFilters]);
 
-  useEffect(() => {
-    if (selectedAppIds !== undefined) {
-      setInternalSelection(selectedAppIds);
-    }
-  }, [selectedAppIds]);
-
-  const activeSelection = selectedAppIds !== undefined ? selectedAppIds : internalSelection;
-
-  const handleSelectionChange = useCallback(
-    (newSelection: (string | number)[]) => {
-      setInternalSelection(newSelection);
-      if (onSelectionChange) {
-        onSelectionChange(newSelection);
-      }
-    },
-    [onSelectionChange]
-  );
-
-  const handleToggleMenu = useCallback((id: string | null) => {
-    setActiveMenuId(id);
-  }, []);
-
-  // Close dropdown menu on outside click
-  useEffect(() => {
-    if (!activeMenuId) return;
-    const handleClickOutside = () => setActiveMenuId(null);
-    window.addEventListener("click", handleClickOutside);
-    return () => window.removeEventListener("click", handleClickOutside);
-  }, [activeMenuId]);
-
-  // Define DataTable columns
-  const columns = useMemo<ColumnDef<CandidateApplication>[]>(
+  // Column Definitions
+  const columns: ColumnDef<CandidateApplication>[] = useMemo(
     () => [
       {
         id: "candidateName",
-        label: "Candidate",
+        label: "Candidate & Profile Brief",
         key: "candidateName",
         sortable: true,
         isFilter: true,
@@ -555,7 +642,7 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
             </label>
             <FormField
               type="text"
-              placeholder="Search candidate name or email..."
+              placeholder="Search candidate name..."
               value={columnFilters.candidateName || ""}
               onChange={(e: any) => handleColumnFilterChange("candidateName", e.target?.value ?? e)}
               fieldSize="sm"
@@ -565,7 +652,7 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
               <button
                 type="button"
                 onClick={() => handleClearColumnFilter("candidateName")}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium self-end"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium self-end cursor-pointer"
               >
                 Clear Filter
               </button>
@@ -575,36 +662,18 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
         render: (app) => <CandidateCell app={app} onSelectApplication={onSelectApplication} />,
       },
       {
-        id: "jobTitle",
-        label: "Job Opening",
-        key: "jobTitle",
+        id: "matchScore",
+        label: "AI Resume Match & Eligibility",
+        key: "matchScore",
         sortable: true,
-        isFilter: true,
-        filterSectionRender: () => (
-          <div className="flex flex-col gap-2 p-1 min-w-[210px]" onClick={(e) => e.stopPropagation()}>
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-              Filter by Job Title
-            </label>
-            <FormField
-              type="text"
-              placeholder="Search job title..."
-              value={columnFilters.jobTitle || ""}
-              onChange={(e: any) => handleColumnFilterChange("jobTitle", e.target?.value ?? e)}
-              fieldSize="sm"
-              autoFocus
-            />
-            {columnFilters.jobTitle && (
-              <button
-                type="button"
-                onClick={() => handleClearColumnFilter("jobTitle")}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium self-end"
-              >
-                Clear Filter
-              </button>
-            )}
-          </div>
-        ),
-        render: (app) => <JobCell app={app} />,
+        render: (app) => <MatchScoreCell app={app} onSelectApplication={onSelectApplication} />,
+      },
+      {
+        id: "skills",
+        label: "Key Skills",
+        key: "skills",
+        sortable: false,
+        render: (app) => <SkillsCell app={app} />,
       },
       {
         id: "stage",
@@ -639,24 +708,17 @@ export const ApplicationDetailTable: React.FC<ApplicationDetailTableProps> = ({
         ),
       },
       {
-        id: "matchScore",
-        label: "AI Match Score",
-        key: "matchScore",
-        sortable: true,
-        render: (app) => <MatchScoreCell score={app.matchScore} />,
-      },
-      {
         id: "appliedDate",
         label: "Applied Date",
         key: "appliedDate",
         sortable: true,
         render: (app) => (
           <div className="py-1">
-            <div className="text-sm text-slate-800 dark:text-slate-200 font-medium">
+            <div className="text-xs text-slate-800 dark:text-slate-200 font-medium">
               {app.appliedDate}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              {app.experienceYears} yrs experience
+            <div className="text-2xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Notice: {app.noticePeriod}
             </div>
           </div>
         ),

@@ -14,12 +14,36 @@ export type ApplicationStatus =
   | "Hired"
   | "Rejected";
 
+export type EligibilityStatus =
+  | "Highly Qualified"
+  | "Eligible"
+  | "Partially Eligible"
+  | "Under Review"
+  | "Not Eligible";
+
 export interface CandidateNote {
   id: string;
   author: string;
   date: string;
   content: string;
   rating?: number;
+}
+
+export interface EligibilityCriterion {
+  criterion: string;
+  status: "met" | "partially_met" | "unmet";
+  details: string;
+}
+
+export interface ResumeMatchBreakdown {
+  overallMatch: number; // 0 - 100
+  skillsMatch: number; // 0 - 100
+  experienceMatch: number; // 0 - 100
+  educationMatch: number; // 0 - 100
+  matchedSkills: string[];
+  missingSkills?: string[];
+  eligibilityCriteria?: EligibilityCriterion[];
+  aiRecommendation?: string;
 }
 
 export interface CandidateApplication {
@@ -36,7 +60,11 @@ export interface CandidateApplication {
   status: ApplicationStatus;
   appliedDate: string;
   experienceYears: number;
+  education?: string;
   matchScore: number; // e.g. 92 for 92%
+  eligibilityStatus?: EligibilityStatus;
+  briefInfo?: string;
+  matchBreakdown?: ResumeMatchBreakdown;
   currentCompany: string;
   currentRole: string;
   expectedSalary: string;
@@ -55,4 +83,6 @@ export interface ApplicationFilterState {
   stage: string;
   jobTitle: string;
   department: string;
+  matchTier?: string;
 }
+
