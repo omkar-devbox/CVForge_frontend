@@ -256,7 +256,17 @@ export const AllCandidatesPage: React.FC = () => {
             className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium shrink-0 rounded-lg shadow-2xs"
             title="Import Candidates (JSON / Payload)"
           >
-            Upload File
+            Upload Files
+          </Button>
+
+          <Button
+            onClick={() => setIsUploadModalOpen(true)}
+            variant="outline"
+            leftIcon={<Upload className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
+            className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium shrink-0 rounded-lg shadow-2xs"
+            title="Import Candidates (JSON / Payload)"
+          >
+            Upload Files
           </Button>
         </div>
       }
