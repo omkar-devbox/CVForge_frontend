@@ -44,6 +44,7 @@ export interface Candidate {
   location: string;
   skills: string[];
   primarySkill: string;
+  overallProfile?: string;
   highestDegree: string;
   status: CandidateStatus;
   stage: CandidateStage;
@@ -55,10 +56,12 @@ export interface Candidate {
   expectedSalary?: string;
   resumeUrl?: string;
   resumeFileName?: string;
+  downloadUrl?: string;
   tags: string[];
   createdAt: string;
   lastActivity: string;
   notes: CandidateNote[];
+  note?: string;
   applicationHistory: CandidateApplicationHistory[];
 }
 

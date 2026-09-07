@@ -51,8 +51,8 @@ export const CandidateDeleteModal: React.FC<CandidateDeleteModalProps> = ({
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
               {isBulk
-                ? `Are you sure you want to permanently delete the selected ${selectedCount} candidate profile(s)? This action cannot be undone.`
-                : `Are you sure you want to delete the candidate profile for "${candidateName}"? All application history and records will be removed.`}
+                ? `Are you sure you want to delete the selected ${selectedCount} candidate profile(s)? The profiles will be soft-deleted without permanent data loss.`
+                : `Are you sure you want to delete the candidate profile for "${candidateName}"? The profile will be soft-deleted without permanent data loss.`}
             </p>
           </div>
         </div>

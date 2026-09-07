@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from "react";
-import { Plus, Upload, Search, X } from "lucide-react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { candidatesApi } from "../services/candidatesApi";
+import { Upload, Search, X, RefreshCw } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Page } from "@/shared/pages/Page/Page";
 import { CandidateDetailTable } from "./items/CandidateDetailTable";
@@ -7,12 +8,13 @@ import { CandidateDetailModal } from "./items/CandidateDetailModal";
 import { CandidateFormModal } from "./items/CandidateFormModal";
 import { CandidateUploadModal } from "./items/CandidateUploadModal";
 import { CandidateDeleteModal } from "./items/CandidateDeleteModal";
-import { INITIAL_CANDIDATES } from "./data/mockCandidatesData";
 import { toast } from "@/shared/ui/toast";
 import type { Candidate, CandidateFilterState, CandidateStatus, CandidateStage } from "./types/candidate.types";
 
 export const AllCandidatesPage: React.FC = () => {
-  const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
+  // Pure API-driven state (No mock data)
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<CandidateFilterState>({
     search: "",
     status: "All",
@@ -31,7 +33,33 @@ export const AllCandidatesPage: React.FC = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [deletingCandidateTarget, setDeletingCandidateTarget] = useState<{ id: string; name: string } | null>(null);
 
-  // Filtered candidates list
+  /**
+   * Fetch all candidates from backend API (GET /api/v1/candidates)
+   */
+  const loadCandidates = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const result = await candidatesApi.listCandidates({
+        limit: 100,
+        offset: 0,
+        status: filters.status !== "All" ? filters.status : undefined,
+        overall_profile: filters.experience !== "All" ? filters.experience : undefined,
+      });
+      setCandidates(result.items);
+    } catch (err) {
+      console.warn("Failed to load candidates from API:", err);
+      toast.error("Could not fetch candidate profiles from server.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filters.status, filters.experience]);
+
+  // Load from API on mount and filter changes
+  useEffect(() => {
+    loadCandidates();
+  }, [loadCandidates]);
+
+  // Filtered candidates list (search & client filters)
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
       // Status filter
@@ -54,7 +82,8 @@ export const AllCandidatesPage: React.FC = () => {
         const matchesRole = candidate.currentRole.toLowerCase().includes(query);
         const matchesCompany = candidate.company.toLowerCase().includes(query);
         const matchesSkills = candidate.skills.some((s) => s.toLowerCase().includes(query));
-        if (!matchesName && !matchesEmail && !matchesRole && !matchesCompany && !matchesSkills) {
+        const matchesTags = candidate.tags?.some((t) => t.toLowerCase().includes(query));
+        if (!matchesName && !matchesEmail && !matchesRole && !matchesCompany && !matchesSkills && !matchesTags) {
           return false;
         }
       }
@@ -78,19 +107,70 @@ export const AllCandidatesPage: React.FC = () => {
     });
   };
 
+  // Open candidate details with deep extraction data from GET /api/v1/candidates/{id}
+  const handleSelectCandidate = async (candidate: Candidate) => {
+    setSelectedCandidateDetail(candidate);
+    if (/^\d+$/.test(candidate.id)) {
+      const fullDetail = await candidatesApi.getCandidateById(candidate.id);
+      if (fullDetail) {
+        setSelectedCandidateDetail(fullDetail);
+      }
+    }
+  };
+
   // CRUD Handlers
-  const handleSaveCandidate = (candidateData: Partial<Candidate>) => {
+  const handleSaveCandidate = async (candidateData: Partial<Candidate>) => {
     if (candidateData.id) {
-      // Update existing candidate
+      // Optimistically update existing candidate in state
       setCandidates((prev) =>
         prev.map((c) => (c.id === candidateData.id ? ({ ...c, ...candidateData } as Candidate) : c))
       );
       if (selectedCandidateDetail?.id === candidateData.id) {
         setSelectedCandidateDetail((prev) => (prev ? ({ ...prev, ...candidateData } as Candidate) : null));
       }
-      toast.success(`Candidate profile "${candidateData.fullName}" updated successfully!`);
+
+      // Call backend Edit Candidate Profile API (PATCH /candidates/:id/profile)
+      if (/^\d+$/.test(candidateData.id)) {
+        try {
+          const profilePayload = {
+            full_name: candidateData.fullName,
+            name: candidateData.fullName,
+            email: candidateData.email,
+            contact_no: candidateData.phone,
+            phone: candidateData.phone,
+            status: candidateData.status,
+            notice_period: candidateData.noticePeriod,
+            current_ctc: candidateData.currentSalary,
+            expected_ctc: candidateData.expectedSalary,
+            source: candidateData.source,
+            note:
+              candidateData.note !== undefined
+                ? candidateData.note
+                : candidateData.notes && candidateData.notes.length > 0
+                  ? candidateData.notes[0].text
+                  : undefined,
+          };
+
+          const result = await candidatesApi.editCandidateProfile(candidateData.id, profilePayload);
+          if (result?.candidate) {
+            const updated = result.candidate;
+            setCandidates((prev) =>
+              prev.map((c) => (c.id === candidateData.id ? { ...c, ...updated } : c))
+            );
+            if (selectedCandidateDetail?.id === candidateData.id) {
+              setSelectedCandidateDetail((prev) => (prev ? { ...prev, ...updated } : null));
+            }
+          }
+          toast.success(result?.message || `Candidate profile "${candidateData.fullName || 'Candidate'}" updated successfully!`);
+        } catch (err) {
+          console.error("Error updating candidate profile:", err);
+          toast.error("Failed to save profile changes to server.");
+        }
+      } else {
+        toast.success(`Candidate profile "${candidateData.fullName || 'Candidate'}" updated successfully!`);
+      }
     } else {
-      // Create new candidate
+      // Create new candidate locally
       const newCandidate: Candidate = {
         id: `CND-${Date.now().toString().slice(-4)}`,
         fullName: candidateData.fullName || "New Candidate",
@@ -100,19 +180,19 @@ export const AllCandidatesPage: React.FC = () => {
         company: candidateData.company || "Tech Inc.",
         experienceYears: candidateData.experienceYears || 3,
         location: candidateData.location || "Bengaluru, India",
-        skills: candidateData.skills || ["React", "TypeScript"],
-        primarySkill: candidateData.primarySkill || "React",
-        highestDegree: candidateData.highestDegree || "B.Tech in Computer Science",
+        skills: candidateData.skills || ["Engineering"],
+        primarySkill: candidateData.primarySkill || "Engineering",
+        highestDegree: candidateData.highestDegree || "B.Tech",
         status: candidateData.status || "Active",
         stage: candidateData.stage || "New",
-        source: candidateData.source || "Direct Entry",
-        appliedJobTitle: candidateData.appliedJobTitle || "General Pool",
+        source: candidateData.source || "Manual Entry",
+        appliedJobTitle: candidateData.appliedJobTitle || "General Application",
         rating: candidateData.rating || 4,
         noticePeriod: candidateData.noticePeriod || "30 Days",
         currentSalary: candidateData.currentSalary || "N/A",
         expectedSalary: candidateData.expectedSalary || "N/A",
-        resumeFileName: `${(candidateData.fullName || "Candidate").replace(/\s+/g, "_")}_CV.pdf`,
-        tags: candidateData.tags || ["New Entry"],
+        resumeFileName: candidateData.resumeFileName || `${(candidateData.fullName || "Candidate").replace(/\s+/g, "_")}_CV.pdf`,
+        tags: candidateData.tags || ["Direct Entry"],
         createdAt: new Date().toISOString().split("T")[0],
         lastActivity: new Date().toISOString().split("T")[0],
         notes: [],
@@ -125,8 +205,9 @@ export const AllCandidatesPage: React.FC = () => {
   };
 
   const handleImportCandidates = (importedCandidates: Candidate[]) => {
-    setCandidates((prev) => [...importedCandidates, ...prev]);
-    toast.success(`Successfully imported ${importedCandidates.length} candidate profile(s)!`);
+    // Re-fetch real records from API so everything is synchronized
+    loadCandidates();
+    toast.success(`Successfully uploaded ${importedCandidates.length} candidate file(s)!`);
   };
 
   const handleShareCandidate = (candidate: Candidate) => {
@@ -139,48 +220,82 @@ export const AllCandidatesPage: React.FC = () => {
     }
   };
 
-  const handleDownloadResume = (candidate: Candidate) => {
-    toast.success(`Downloading resume file: ${candidate.resumeFileName || `${candidate.fullName}_Resume.pdf`}`);
+  const handleDownloadResume = async (candidate: Candidate) => {
+    const fileName = candidate.resumeFileName || `${candidate.fullName}_Resume`;
+    const toastId = toast.loading(`Downloading resume: ${fileName}...`);
+    try {
+      await candidatesApi.downloadResumeFile(candidate);
+      toast.dismiss(toastId);
+      toast.success(`Successfully downloaded ${fileName}`);
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      toast.error(
+        `Failed to download resume: ${err?.message || "File not found or backend unavailable"}`
+      );
+    }
   };
 
-  const handleStatusChange = (candidateId: string, newStatus: CandidateStatus) => {
+  const handleStatusChange = async (candidateId: string, newStatus: CandidateStatus) => {
     setCandidates((prev) =>
       prev.map((c) => (c.id === candidateId ? { ...c, status: newStatus } : c))
     );
     if (selectedCandidateDetail?.id === candidateId) {
       setSelectedCandidateDetail((prev) => (prev ? { ...prev, status: newStatus } : null));
     }
+    if (/^\d+$/.test(candidateId)) {
+      await candidatesApi.updateCandidateField(candidateId, "status", newStatus);
+    }
     toast.success(`Candidate status updated to "${newStatus}"`);
   };
 
-  const handleStageChange = (candidateId: string, newStage: CandidateStage) => {
+  const handleStageChange = async (candidateId: string, newStage: CandidateStage) => {
     setCandidates((prev) =>
       prev.map((c) => (c.id === candidateId ? { ...c, stage: newStage } : c))
     );
     if (selectedCandidateDetail?.id === candidateId) {
       setSelectedCandidateDetail((prev) => (prev ? { ...prev, stage: newStage } : null));
     }
+    if (/^\d+$/.test(candidateId)) {
+      await candidatesApi.updateCandidateField(candidateId, "stage", newStage);
+    }
     toast.success(`Candidate stage updated to "${newStage}"`);
   };
 
-  const handleAddNote = (candidateId: string, text: string) => {
-    const newNote = {
+  const handleAddNote = async (candidateId: string, text: string) => {
+    const optimisticNote = {
       id: `note-${Date.now()}`,
-      author: "Hiring Manager",
+      author: "Recruiter Note",
       text,
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toISOString(),
     };
 
     setCandidates((prev) =>
       prev.map((c) =>
-        c.id === candidateId ? { ...c, notes: [newNote, ...c.notes] } : c
+        c.id === candidateId ? { ...c, note: text, notes: [optimisticNote, ...c.notes] } : c
       )
     );
 
     if (selectedCandidateDetail?.id === candidateId) {
       setSelectedCandidateDetail((prev) =>
-        prev ? { ...prev, notes: [newNote, ...prev.notes] } : null
+        prev ? { ...prev, note: text, notes: [optimisticNote, ...prev.notes] } : null
       );
+    }
+
+    if (/^\d+$/.test(candidateId)) {
+      try {
+        const result = await candidatesApi.editCandidateProfile(candidateId, { note: text });
+        if (result?.candidate) {
+          const updated = result.candidate;
+          setCandidates((prev) =>
+            prev.map((c) => (c.id === candidateId ? { ...c, ...updated } : c))
+          );
+          if (selectedCandidateDetail?.id === candidateId) {
+            setSelectedCandidateDetail((prev) => (prev ? { ...prev, ...updated } : null));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to persist note to server:", err);
+      }
     }
     toast.success("Added new note to candidate profile.");
   };
@@ -189,30 +304,50 @@ export const AllCandidatesPage: React.FC = () => {
     setDeletingCandidateTarget({ id: candidateId, name });
   };
 
-  const handleConfirmDeleteCandidate = (candidateId: string, name: string) => {
-    setCandidates((prev) => prev.filter((c) => c.id !== candidateId));
-    setSelectedCandidateIds((prev) => prev.filter((id) => String(id) !== String(candidateId)));
-    toast.info(`Deleted candidate profile "${name}".`);
-    setDeletingCandidateTarget(null);
+  const handleConfirmDeleteCandidate = async (candidateId: string, name: string) => {
+    try {
+      if (/^\d+$/.test(candidateId)) {
+        await candidatesApi.softDeleteCandidate(candidateId);
+      }
+      setCandidates((prev) => prev.filter((c) => c.id !== candidateId));
+      setSelectedCandidateIds((prev) => prev.filter((id) => String(id) !== String(candidateId)));
+      toast.info(`Candidate "${name}" soft-deleted successfully.`);
+    } catch (err) {
+      console.error(`Failed to soft-delete candidate ${candidateId}:`, err);
+      toast.error(`Failed to delete candidate "${name}". Please try again.`);
+    } finally {
+      setDeletingCandidateTarget(null);
+    }
   };
 
   const handleBulkDeleteRequest = (candidateIds: (string | number)[]) => {
     setBulkDeleteCandidateIds(candidateIds);
   };
 
-  const handleConfirmBulkDelete = () => {
+  const handleConfirmBulkDelete = async () => {
     if (bulkDeleteCandidateIds.length === 0) return;
-    const idsSet = new Set(bulkDeleteCandidateIds.map(String));
-    setCandidates((prev) => prev.filter((c) => !idsSet.has(String(c.id))));
-    toast.info(`Successfully deleted ${bulkDeleteCandidateIds.length} selected candidate profile(s).`);
-    setBulkDeleteCandidateIds([]);
-    setSelectedCandidateIds([]);
+    try {
+      for (const id of bulkDeleteCandidateIds) {
+        if (/^\d+$/.test(String(id))) {
+          await candidatesApi.softDeleteCandidate(id);
+        }
+      }
+      const idsSet = new Set(bulkDeleteCandidateIds.map(String));
+      setCandidates((prev) => prev.filter((c) => !idsSet.has(String(c.id))));
+      toast.info(`Successfully soft-deleted ${bulkDeleteCandidateIds.length} candidate profile(s).`);
+    } catch (err) {
+      console.error("Failed to soft-delete some selected candidates:", err);
+      toast.error("Failed to soft-delete some candidate profiles. Please try again.");
+    } finally {
+      setBulkDeleteCandidateIds([]);
+      setSelectedCandidateIds([]);
+    }
   };
 
   return (
     <Page
       title="All Candidates"
-      subtitle="Manage candidate profiles, review qualifications, track interview stages, and import talent data."
+      subtitle="Manage real-time candidate profiles, review qualifications, track interview stages, and import talent data."
       breadcrumbs={[{ label: "Candidates" }]}
       actions={
         <div className="flex items-center gap-2">
@@ -236,27 +371,26 @@ export const AllCandidatesPage: React.FC = () => {
             )}
           </div>
 
-          {/* Add Candidate Button */}
+          {/* Refresh Button */}
           <Button
-            onClick={() => {
-              setEditingCandidate(null);
-              setIsFormModalOpen(true);
-            }}
-            leftIcon={<Plus className="w-4 h-4" />}
-            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-xs shrink-0 rounded-lg px-4"
+            variant="outline"
+            onClick={() => loadCandidates()}
+            disabled={isLoading}
+            leftIcon={<RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />}
+            className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium shrink-0 rounded-lg shadow-2xs"
+            title="Refresh candidate table from API"
           >
-            Add Candidate
+            Refresh
           </Button>
 
-          {/* Bulk Upload Button */}
+          {/* Upload Multiple File Button */}
           <Button
             onClick={() => setIsUploadModalOpen(true)}
-            variant="outline"
-            leftIcon={<Upload className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
-            className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium shrink-0 rounded-lg shadow-2xs"
-            title="Import Candidates (JSON / Payload)"
+            leftIcon={<Upload className="w-4 h-4" />}
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-xs shrink-0 rounded-lg px-4"
+            title="Upload Multiple Candidate Files"
           >
-            Upload File
+            Upload Multiple File
           </Button>
         </div>
       }
@@ -267,7 +401,7 @@ export const AllCandidatesPage: React.FC = () => {
           candidates={filteredCandidates}
           selectedCandidateIds={selectedCandidateIds}
           onSelectionChange={setSelectedCandidateIds}
-          onSelectCandidate={setSelectedCandidateDetail}
+          onSelectCandidate={handleSelectCandidate}
           onEditCandidate={(candidate) => {
             setEditingCandidate(candidate);
             setIsFormModalOpen(true);
@@ -279,6 +413,7 @@ export const AllCandidatesPage: React.FC = () => {
           onStatusChange={handleStatusChange}
           onStageChange={handleStageChange}
           onResetFilters={handleResetFilters}
+          isLoading={isLoading}
         />
       </div>
 
@@ -309,7 +444,7 @@ export const AllCandidatesPage: React.FC = () => {
         editingCandidate={editingCandidate}
       />
 
-      {/* Bulk Upload Candidate Payload Modal */}
+      {/* Multiple Candidate File Upload Modal */}
       <CandidateUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}

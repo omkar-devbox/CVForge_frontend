@@ -71,7 +71,7 @@ const getBaseUrl = (): string => {
     return envUrl.replace(/\/+$/, "");
   }
 
-  return "http://localhost:8001/api/v1";
+  return "http://localhost:8000/api/v1";
 };
 
 /* ================================================================

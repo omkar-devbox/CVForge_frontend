@@ -6,7 +6,9 @@ import {
   ModalFooter,
 } from "@/shared/ui/Modal";
 import { Button } from "@/shared/ui/button";
-import type { Candidate, CandidateStatus, CandidateStage } from "../types/candidate.types";
+import { User, Mail, Phone, DollarSign, Clock, Tag, Activity, FileText } from "lucide-react";
+import type { Candidate, CandidateStatus, CandidateNote } from "../types/candidate.types";
+import { formatDateTime } from "@/shared/lib/utils";
 
 export interface CandidateFormModalProps {
   isOpen: boolean;
@@ -21,287 +23,314 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
   onSaveCandidate,
   editingCandidate,
 }) => {
-  const [formData, setFormData] = useState<Partial<Candidate>>({
+  const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
-    currentRole: "",
-    company: "",
-    experienceYears: 3,
-    location: "Bengaluru, India",
-    skills: ["React", "TypeScript", "Node.js"],
-    highestDegree: "B.Tech in Computer Science",
-    status: "Active",
-    stage: "New",
-    source: "LinkedIn",
-    appliedJobTitle: "Senior Software Engineer",
-    rating: 4,
-    noticePeriod: "30 Days",
-    currentSalary: "₹15,00,000 / yr",
-    expectedSalary: "₹20,00,000 / yr",
-    tags: ["Candidate"],
+    status: "Active" as CandidateStatus,
+    noticePeriod: "",
+    currentSalary: "",
+    expectedSalary: "",
+    source: "",
+    note: "",
   });
-
-  const [skillsInput, setSkillsInput] = useState("");
 
   useEffect(() => {
     if (editingCandidate) {
-      setFormData(editingCandidate);
-      setSkillsInput(editingCandidate.skills ? editingCandidate.skills.join(", ") : "");
+      setFormData({
+        fullName: editingCandidate.fullName && editingCandidate.fullName !== "—" ? editingCandidate.fullName : "",
+        email: editingCandidate.email && editingCandidate.email !== "—" ? editingCandidate.email : "",
+        phone: editingCandidate.phone && editingCandidate.phone !== "—" ? editingCandidate.phone : "",
+        status: editingCandidate.status || "Active",
+        noticePeriod: editingCandidate.noticePeriod && editingCandidate.noticePeriod !== "—" ? editingCandidate.noticePeriod : "",
+        currentSalary: editingCandidate.currentSalary && editingCandidate.currentSalary !== "—" ? editingCandidate.currentSalary : "",
+        expectedSalary: editingCandidate.expectedSalary && editingCandidate.expectedSalary !== "—" ? editingCandidate.expectedSalary : "",
+        source: editingCandidate.source && editingCandidate.source !== "—" ? editingCandidate.source : "",
+        note:
+          editingCandidate.note?.trim() ||
+          (editingCandidate.notes && editingCandidate.notes.length > 0
+            ? editingCandidate.notes[0].text?.trim()
+            : "") ||
+          "",
+      });
     } else {
       setFormData({
         fullName: "",
         email: "",
         phone: "",
-        currentRole: "",
-        company: "",
-        experienceYears: 3,
-        location: "Bengaluru, India",
-        skills: ["React", "TypeScript", "Node.js"],
-        highestDegree: "B.Tech in Computer Science",
         status: "Active",
-        stage: "New",
-        source: "LinkedIn",
-        appliedJobTitle: "Senior Software Engineer",
-        rating: 4,
-        noticePeriod: "30 Days",
-        currentSalary: "₹15,00,000 / yr",
-        expectedSalary: "₹20,00,000 / yr",
-        tags: ["Candidate"],
+        noticePeriod: "",
+        currentSalary: "",
+        expectedSalary: "",
+        source: "",
+        note: "",
       });
-      setSkillsInput("React, TypeScript, Node.js");
     }
   }, [editingCandidate, isOpen]);
 
-  const handleChange = (field: keyof Candidate, value: any) => {
+  const handleChange = (field: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const skillsArray = skillsInput
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const existingNotes = editingCandidate?.notes || [];
+    const noteText = formData.note.trim();
+    let updatedNotes: CandidateNote[] = [...existingNotes];
+
+    if (noteText) {
+      if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+        // Note unchanged
+        updatedNotes = existingNotes;
+      } else {
+        // Prepend new or updated note
+        updatedNotes = [
+          {
+            id: `NOTE-${Date.now()}`,
+            author: "Recruiter Note",
+            text: noteText,
+            date: new Date().toISOString(),
+          },
+          ...existingNotes.filter((n) => n.text !== noteText),
+        ];
+      }
+    } else {
+      updatedNotes = [];
+    }
 
     onSaveCandidate({
-      ...formData,
-      skills: skillsArray,
-      primarySkill: skillsArray[0] || "General Engineering",
+      ...(editingCandidate || {}),
+      fullName: formData.fullName.trim() || editingCandidate?.fullName || "Candidate",
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      status: formData.status,
+      noticePeriod: formData.noticePeriod,
+      currentSalary: formData.currentSalary,
+      expectedSalary: formData.expectedSalary,
+      source: formData.source,
+      note: noteText,
+      notes: updatedNotes,
     });
     onClose();
   };
 
   return (
-    <Modal open={isOpen} onClose={onClose} size="lg">
+    <Modal open={isOpen} onClose={onClose} size="2xl" className="w-full">
       <ModalHeader
-        title={editingCandidate ? "Edit Candidate Profile" : "Add New Candidate"}
-        description="Enter candidate details, experience, skills, and application status."
+        title={editingCandidate ? "Edit Candidate Profile" : "Add Candidate"}
+        description="Update candidate contact information, recruitment status, CTC, and remarks."
         onClose={onClose}
       />
 
       <form onSubmit={handleSubmit}>
-        <ModalBody className="p-6 max-h-[70vh] overflow-y-auto space-y-4">
-          {/* Full Name & Email */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.fullName || ""}
-                onChange={(e) => handleChange("fullName", e.target.value)}
-                placeholder="e.g. Priya Sharma"
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.email || ""}
-                onChange={(e) => handleChange("email", e.target.value)}
-                placeholder="e.g. priya.sharma@example.com"
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
+        <ModalBody className="p-6 max-h-[75vh] overflow-y-auto space-y-4">
+          {/* Section 1: Contact Details (Editable) */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Basic & Contact Information
+            </h4>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              {/* Full Name */}
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <User className="w-3.5 h-3.5 text-slate-400" />
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) => handleChange("fullName", e.target.value)}
+                  placeholder="e.g. Priya Sharma"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder="e.g. priya@example.com"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Contact Number */}
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <Phone className="w-3.5 h-3.5 text-slate-400" />
+                  Contact Number
+                </label>
+                <input
+                  type="text"
+                  value={formData.phone}
+                  onChange={(e) => handleChange("phone", e.target.value)}
+                  placeholder="e.g. +91 98765 43210"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Phone & Location */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                value={formData.phone || ""}
-                onChange={(e) => handleChange("phone", e.target.value)}
-                placeholder="e.g. +91 98765 43210"
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location || ""}
-                onChange={(e) => handleChange("location", e.target.value)}
-                placeholder="e.g. Bengaluru, India"
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+          {/* Section 2: Recruitment & Compensation */}
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Recruitment & Compensation
+            </h4>
 
-          {/* Current Role & Current Company */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Current Role
-              </label>
-              <input
-                type="text"
-                value={formData.currentRole || ""}
-                onChange={(e) => handleChange("currentRole", e.target.value)}
-                placeholder="e.g. Senior Full Stack Engineer"
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Current Company
-              </label>
-              <input
-                type="text"
-                value={formData.company || ""}
-                onChange={(e) => handleChange("company", e.target.value)}
-                placeholder="e.g. TechCorp Solutions"
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+            {/* Status & Notice Period */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <Activity className="w-3.5 h-3.5 text-slate-400" />
+                  Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleChange("status", e.target.value as CandidateStatus)}
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                >
+                  <option value="Active">Active</option>
+                  <option value="In Pipeline">In Pipeline</option>
+                  <option value="Interviewing">Interviewing</option>
+                  <option value="Hired">Hired</option>
+                  <option value="Archived">Archived</option>
+                  <option value="Blacklisted">Blacklisted</option>
+                </select>
+              </div>
 
-          {/* Experience & Notice Period */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Experience (Years)
-              </label>
-              <input
-                type="number"
-                value={formData.experienceYears ?? 3}
-                onChange={(e) => handleChange("experienceYears", Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  Notice Period
+                </label>
+                <input
+                  type="text"
+                  list="notice-period-presets"
+                  value={formData.noticePeriod}
+                  onChange={(e) => handleChange("noticePeriod", e.target.value)}
+                  placeholder="e.g. Immediate, 30 Days"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                />
+                <datalist id="notice-period-presets">
+                  <option value="Immediate" />
+                  <option value="15 Days" />
+                  <option value="30 Days" />
+                  <option value="60 Days" />
+                  <option value="90 Days" />
+                </datalist>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Notice Period
-              </label>
-              <select
-                value={formData.noticePeriod || "30 Days"}
-                onChange={(e) => handleChange("noticePeriod", e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Immediate">Immediate Joiner</option>
-                <option value="15 Days">15 Days</option>
-                <option value="30 Days">30 Days</option>
-                <option value="60 Days">60 Days</option>
-                <option value="90 Days">90 Days</option>
-              </select>
-            </div>
-          </div>
 
-          {/* Skills */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-              Skills (Comma-separated)
-            </label>
-            <input
-              type="text"
-              value={skillsInput}
-              onChange={(e) => setSkillsInput(e.target.value)}
-              placeholder="e.g. React, TypeScript, Node.js, AWS"
-              className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            {/* Current CTC & Expected CTC */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                  Current CTC
+                </label>
+                <input
+                  type="text"
+                  value={formData.currentSalary}
+                  onChange={(e) => handleChange("currentSalary", e.target.value)}
+                  placeholder="e.g. ₹15,00,000 / yr or 15 LPA"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-          {/* Status & Stage */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Status
-              </label>
-              <select
-                value={formData.status || "Active"}
-                onChange={(e) => handleChange("status", e.target.value as CandidateStatus)}
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Active">Active</option>
-                <option value="In Pipeline">In Pipeline</option>
-                <option value="Interviewing">Interviewing</option>
-                <option value="Hired">Hired</option>
-                <option value="Archived">Archived</option>
-                <option value="Blacklisted">Blacklisted</option>
-              </select>
+              <div>
+                <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                  Expected CTC
+                </label>
+                <input
+                  type="text"
+                  value={formData.expectedSalary}
+                  onChange={(e) => handleChange("expectedSalary", e.target.value)}
+                  placeholder="e.g. ₹20,00,000 / yr or 20 LPA"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Pipeline Stage
-              </label>
-              <select
-                value={formData.stage || "New"}
-                onChange={(e) => handleChange("stage", e.target.value as CandidateStage)}
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="New">New</option>
-                <option value="Screening">Screening</option>
-                <option value="Interview">Interview</option>
-                <option value="Offer">Offer</option>
-                <option value="Hired">Hired</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            </div>
-          </div>
 
-          {/* Rating & Source */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Source */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Rating (1 - 5)
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={5}
-                value={formData.rating ?? 4}
-                onChange={(e) => handleChange("rating", Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
+              <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                <Tag className="w-3.5 h-3.5 text-slate-400" />
                 Source
               </label>
-              <select
-                value={formData.source || "LinkedIn"}
+              <input
+                type="text"
+                list="candidate-sources-list"
+                value={formData.source}
                 onChange={(e) => handleChange("source", e.target.value)}
+                placeholder="e.g. LinkedIn, Naukri, Referral, Project Name"
                 className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="Naukri">Naukri</option>
-                <option value="Referral">Employee Referral</option>
-                <option value="Career Page">Career Page</option>
-                <option value="Agency">Recruitment Agency</option>
-              </select>
+              />
+              <datalist id="candidate-sources-list">
+                <option value="LinkedIn" />
+                <option value="Naukri" />
+                <option value="Employee Referral" />
+                <option value="Career Page" />
+                <option value="Recruitment Agency" />
+              </datalist>
             </div>
+          </div>
+
+          {/* Section 3: Note Section */}
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+            <label className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+              <FileText className="w-3.5 h-3.5 text-slate-400" />
+              Note / Remarks
+            </label>
+            <textarea
+              rows={3}
+              value={formData.note}
+              onChange={(e) => handleChange("note", e.target.value)}
+              placeholder="Add interview feedback, notes, or remarks about this candidate..."
+              className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500 resize-none leading-relaxed"
+            />
+
+            {/* Show previous notes if editing candidate */}
+            {editingCandidate?.notes && editingCandidate.notes.length > 0 && (
+              <div className="mt-2.5 space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                  Previous Notes ({editingCandidate.notes.length})
+                </span>
+                {editingCandidate.notes.map((n) => {
+                  const noteDateStr =
+                    n.date ||
+                    (n as any).created_at ||
+                    (n as any).timestamp ||
+                    editingCandidate.createdAt;
+                  return (
+                    <div
+                      key={n.id}
+                      className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 text-[11px]"
+                    >
+                      <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-0.5">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                          {n.author || "Recruiter Note"}
+                        </span>
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                          {formatDateTime(noteDateStr)}
+                        </span>
+                      </div>
+                      <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">
+                        {n.text}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </ModalBody>
 
@@ -310,7 +339,7 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
             Cancel
           </Button>
           <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-            {editingCandidate ? "Save Changes" : "Create Candidate"}
+            Save Changes
           </Button>
         </ModalFooter>
       </form>
