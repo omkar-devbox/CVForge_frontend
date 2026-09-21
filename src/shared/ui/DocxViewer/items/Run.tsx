@@ -1,5 +1,6 @@
 import React from "react";
-import type { DocxRun, DocxDrawing } from "../types/docxBridge.types";
+import type { DocxRun, DocxDrawing, DocxParagraph } from "../types/docxBridge.types";
+import { Paragraph } from "./Paragraph";
 import { useDocument } from "../context/DocumentContext";
 import { usePage } from "../context/PageContext";
 import { resolveFontFamily } from "../utils/fontUtils";
@@ -137,8 +138,6 @@ export const Run: React.FC<RunProps> = ({ run, styleDefaults = {} }) => {
     </span>
   );
 };
-
-import { Paragraph } from "./Paragraph";
 
 // ─── Drawing / Image renderer ─────────────────────────────────────────────────
 

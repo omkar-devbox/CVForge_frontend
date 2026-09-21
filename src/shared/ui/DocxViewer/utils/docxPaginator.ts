@@ -5,224 +5,30 @@ import type {
   DocxTable,
   DocxHeaderFooter,
   PaginatedPage,
-} from "../types/docxBridge.types";
+} from "../types";
+import {
+  dxa,
+  resolveSectionGeometry,
+  type SectionGeometry,
+} from "./pageGeometry";
+import { normalizeSectionContent } from "./contentNormalizer";
+import {
+  estimateItemHeight,
+  estimateHeaderFooterHeight,
+} from "./heightEstimator";
 
-// Standard paper dimensions in twips/dxa (1 inch = 1440 dxa, 96 DPI → 1 dxa = 1/15 px)
-export const STANDARD_PAGE_SIZES: Record<string, { width: number; height: number }> = {
-  a4: { width: 11906, height: 16838 },
-  letter: { width: 12240, height: 15840 },
-  legal: { width: 12240, height: 20160 },
-  a3: { width: 16838, height: 23811 },
-  a5: { width: 8419, height: 11906 },
-  b5: { width: 10318, height: 14570 },
-  tabloid: { width: 15840, height: 24480 },
-};
-
-/** Convert dxa (twips) → CSS pixels at 96 DPI */
-export const dxa = (twips: number): number => Math.round(twips / 15);
-
-export interface SectionGeometry {
-  pageWidthPx: number;
-  pageHeightPx: number;
-  topPx: number;
-  bottomPx: number;
-  leftPx: number;
-  rightPx: number;
-  headerTopPx: number;
-  footerBottomPx: number;
-  contentWidthPx: number;
-  availableBodyHeight: number;
-  bgColor: string;
-}
-
-/**
- * Resolves paper geometry in CSS pixels for a section.
- */
-export function resolveSectionGeometry(section: DocxSection): SectionGeometry {
-  const pageSizeConfig = section.page?.size;
-  let baseWidthDxa = 11906;
-  let baseHeightDxa = 16838;
-
-  if (typeof pageSizeConfig === "string") {
-    const key = pageSizeConfig.toLowerCase();
-    if (STANDARD_PAGE_SIZES[key]) {
-      ({ width: baseWidthDxa, height: baseHeightDxa } = STANDARD_PAGE_SIZES[key]);
-    }
-  } else if (pageSizeConfig && typeof pageSizeConfig === "object") {
-    if (pageSizeConfig.width) baseWidthDxa = pageSizeConfig.width;
-    if (pageSizeConfig.height) baseHeightDxa = pageSizeConfig.height;
-  }
-
-  const isLandscape = section.page?.orientation === "landscape";
-  const widthDxa = isLandscape ? Math.max(baseWidthDxa, baseHeightDxa) : Math.min(baseWidthDxa, baseHeightDxa);
-  const heightDxa = isLandscape ? Math.min(baseWidthDxa, baseHeightDxa) : Math.max(baseWidthDxa, baseHeightDxa);
-
-  const pageWidthPx = dxa(widthDxa);
-  const pageHeightPx = dxa(heightDxa);
-
-  const margins = section.page?.margins || {};
-  const topPx = dxa(margins.top ?? 1440);  // 96px default
-  const rightPx = dxa(margins.right ?? 1440);
-  const bottomPx = dxa(margins.bottom ?? 1440);
-  const leftPx = dxa(margins.left ?? 1440);
-  const headerTopPx = dxa(margins.header ?? 709);   // ~47px
-  const footerBottomPx = dxa(margins.footer ?? 709);
-
-  const contentWidthPx = Math.max(200, pageWidthPx - leftPx - rightPx);
-  // Net printable vertical space inside page body margins
-  const availableBodyHeight = Math.max(200, pageHeightPx - topPx - bottomPx);
-  const bgColor = section.background || "#ffffff";
-
-  return {
-    pageWidthPx,
-    pageHeightPx,
-    topPx,
-    bottomPx,
-    leftPx,
-    rightPx,
-    headerTopPx,
-    footerBottomPx,
-    contentWidthPx,
-    availableBodyHeight,
-    bgColor,
-  };
-}
-
-/**
- * Normalizes content items by splitting paragraphs that contain intra-run page breaks.
- * Paragraphs immediately following a page break are marked with `pageBreakBefore: true`.
- */
-export function normalizeSectionContent(items: DocxContentItem[]): DocxContentItem[] {
-  const result: DocxContentItem[] = [];
-
-  for (const item of items) {
-    if ((item as DocxTable).type === "table" || (item as DocxTable).rows) {
-      result.push(item);
-      continue;
-    }
-
-    const para = item as DocxParagraph;
-    const runs = para.runs;
-
-    // Check if any run contains a page break
-    let hasPageBreak = false;
-    if (runs && runs.length > 0) {
-      for (const r of runs) {
-        if (r.breaks?.some((b) => b.type === "page")) {
-          hasPageBreak = true;
-          break;
-        }
-      }
-    }
-
-    if (!hasPageBreak) {
-      result.push(para);
-      continue;
-    }
-
-    // Split paragraph at page break runs
-    let currentRuns: typeof runs = [];
-    let isNextPageBreak = para.pageBreakBefore || false;
-
-    for (const r of runs!) {
-      const pageBrIdx = r.breaks ? r.breaks.findIndex((b) => b.type === "page") : -1;
-      if (pageBrIdx === -1) {
-        currentRuns.push(r);
-      } else {
-        // Run has a page break: slice runs before break
-        const otherBreaks = r.breaks!.filter((b) => b.type !== "page");
-        const rBefore = { ...r, breaks: otherBreaks.length > 0 ? otherBreaks : undefined };
-
-        // Push paragraph segment before break if it has content
-        if (currentRuns.length > 0 || rBefore.text || rBefore.drawings?.length) {
-          if (rBefore.text || rBefore.drawings?.length) currentRuns.push(rBefore);
-          result.push({
-            ...para,
-            pageBreakBefore: isNextPageBreak,
-            runs: currentRuns,
-          });
-          currentRuns = [];
-        }
-
-        // Subsequent segment must break to new page
-        isNextPageBreak = true;
-      }
-    }
-
-    if (currentRuns.length > 0) {
-      result.push({
-        ...para,
-        pageBreakBefore: isNextPageBreak,
-        runs: currentRuns,
-      });
-    } else if (isNextPageBreak && result.length === 0) {
-      // Empty paragraph with page break
-      result.push({
-        ...para,
-        pageBreakBefore: true,
-        runs: [],
-      });
-    }
-  }
-
-  return result;
-}
-
-/**
- * Fast deterministic heuristic height estimator for initial render before DOM measurement.
- */
-export function estimateItemHeight(item: DocxContentItem, contentWidthPx: number): number {
-  if ((item as DocxTable).type === "table" || (item as DocxTable).rows) {
-    const table = item as DocxTable;
-    const rows = table.rows || [];
-    let total = 8; // table borders/padding
-    for (const r of rows) {
-      const row = Array.isArray(r) ? { cells: r } : r;
-      const rh = (row as any).height ? dxa((row as any).height) : 32;
-      total += Math.max(26, rh);
-    }
-    return total;
-  }
-
-  const para = item as DocxParagraph;
-  const sizeHp = para.size ?? para.fontSize ?? 24;
-  const fontSizePx = Math.max(10, Math.round((sizeHp / 2) * 1.33));
-  const lineHeightPx = Math.max(14, Math.round(fontSizePx * 1.35));
-
-  // Compute text length
-  let text = para.text || "";
-  if (para.runs) {
-    text = para.runs.map((r) => r.text || "").join("");
-  }
-
-  const charsPerLine = Math.max(20, Math.floor(contentWidthPx / (fontSizePx * 0.52)));
-  const lineCount = Math.max(1, Math.ceil((text.length || 1) / charsPerLine));
-
-  // Spacing
-  const spacingBefore = para.spacing?.before ? dxa(para.spacing.before) : 0;
-  const spacingAfter = para.spacing?.after ? dxa(para.spacing.after) : 4;
-
-  // Drawings
-  let drawingsHeight = 0;
-  if (para.drawings) {
-    for (const d of para.drawings) {
-      if (d.extent?.cy) drawingsHeight += Math.round(d.extent.cy / 9525);
-      else if (d.extent?.height) drawingsHeight += d.extent.height;
-    }
-  }
-  if (para.runs) {
-    for (const r of para.runs) {
-      if (r.drawings) {
-        for (const d of r.drawings) {
-          if (d.extent?.cy) drawingsHeight += Math.round(d.extent.cy / 9525);
-          else if (d.extent?.height) drawingsHeight += d.extent.height;
-        }
-      }
-    }
-  }
-
-  return (lineCount * lineHeightPx) + spacingBefore + spacingAfter + drawingsHeight;
-}
+// Re-exports for backward compatibility
+export {
+  STANDARD_PAGE_SIZES,
+  dxa,
+  resolveSectionGeometry,
+  type SectionGeometry,
+} from "./pageGeometry";
+export { normalizeSectionContent } from "./contentNormalizer";
+export {
+  estimateItemHeight,
+  estimateHeaderFooterHeight,
+} from "./heightEstimator";
 
 /**
  * Paginates a section's normalized content into discrete pages.
@@ -263,16 +69,22 @@ export function paginateSectionContent(
     if (isTable) {
       const table = item as DocxTable;
       const rows = table.rows || [];
-      const rowHeights = measuredTableRows?.get(idx) || rows.map((r) => {
-        const row = Array.isArray(r) ? { cells: r } : r;
-        return (row as any).height ? dxa((row as any).height) : 32;
-      });
+      const rowHeights =
+        measuredTableRows?.get(idx) ||
+        rows.map((r) => {
+          const row = Array.isArray(r) ? { cells: r } : r;
+          return (row as any).height ? dxa((row as any).height) : 32;
+        });
 
-      const fullTableHeight = measuredHeights?.get(idx) ??
+      const fullTableHeight =
+        measuredHeights?.get(idx) ??
         rowHeights.reduce((sum, h) => sum + h, 8);
 
       // Check if entire table fits on current page
-      if (currentHeight + fullTableHeight <= availableHeight || (rows.length <= 2 && currentPageItems.length === 0)) {
+      if (
+        currentHeight + fullTableHeight <= availableHeight ||
+        (rows.length <= 2 && currentPageItems.length === 0)
+      ) {
         currentPageItems.push(table);
         currentHeight += fullTableHeight;
       } else {
@@ -285,7 +97,10 @@ export function paginateSectionContent(
 
           for (let r = rIdx; r < rows.length; r++) {
             const rh = rowHeights[r] ?? 32;
-            if (batchHeight + rh <= remainingSpace || (batchRowsCount === 0 && currentPageItems.length === 0)) {
+            if (
+              batchHeight + rh <= remainingSpace ||
+              (batchRowsCount === 0 && currentPageItems.length === 0)
+            ) {
               batchHeight += rh;
               batchRowsCount++;
             } else {
@@ -310,7 +125,8 @@ export function paginateSectionContent(
       }
     } else {
       // Paragraph item
-      const itemH = measuredHeights?.get(idx) ?? estimateItemHeight(item, geom.contentWidthPx);
+      const itemH =
+        measuredHeights?.get(idx) ?? estimateItemHeight(item, geom.contentWidthPx);
 
       if (currentHeight + itemH <= availableHeight || currentPageItems.length === 0) {
         currentPageItems.push(item);
@@ -334,28 +150,7 @@ export function paginateSectionContent(
   return pages;
 }
 
-export function estimateHeaderFooterHeight(hf?: DocxHeaderFooter, defaultFallback = 50): number {
-  if (!hf || !hf.content || hf.content.length === 0) return 0;
-  let total = 0;
-  for (const item of hf.content) {
-    if ((item as DocxTable).type === "table" || (item as DocxTable).rows) {
-      const rows = (item as DocxTable).rows || [];
-      total += Math.max(30, rows.length * 24);
-    } else {
-      const p = item as DocxParagraph;
-      const drawings = (p.drawings || []).concat(p.runs?.flatMap((r) => r.drawings || []) || []);
-      const drawingH = drawings.reduce((max, d) => {
-        const cy = d.extent?.cy ? Math.round(d.extent.cy / 9525) : 0;
-        return Math.max(max, cy);
-      }, 0);
-      const textH = p.text || p.runs?.some((r) => r.text) ? 22 : 0;
-      total += Math.max(textH, drawingH, 18);
-    }
-  }
-  return Math.max(defaultFallback, total);
-}
-
-function toHeaderFooterRecord(
+export function toHeaderFooterRecord(
   hf?: Record<string, DocxHeaderFooter> | DocxHeaderFooter[]
 ): Record<string, DocxHeaderFooter> {
   if (!hf) return {};
@@ -437,8 +232,8 @@ export function buildPaginatedPages(
       hdrType = "default",
       ftrType = "default"
     ): number => {
-      const hdrH = hdr ? (secHeaderHeights?.get(hdrType) ?? estimateHeaderFooterHeight(hdr, 60)) : 0;
-      const ftrH = ftr ? (secFooterHeights?.get(ftrType) ?? estimateHeaderFooterHeight(ftr, 55)) : 0;
+      const hdrH = hdr ? secHeaderHeights?.get(hdrType) ?? estimateHeaderFooterHeight(hdr, 60) : 0;
+      const ftrH = ftr ? secFooterHeights?.get(ftrType) ?? estimateHeaderFooterHeight(ftr, 55) : 0;
 
       const topZone = hdr ? Math.max(geom.topPx, geom.headerTopPx + hdrH + 6) : geom.topPx;
       const bottomZone = ftr ? Math.max(geom.bottomPx, geom.footerBottomPx + ftrH + 6) : geom.bottomPx;
@@ -446,7 +241,12 @@ export function buildPaginatedPages(
       return Math.max(150, geom.pageHeightPx - topZone - bottomZone);
     };
 
-    const effectiveAvailableHeight = calcEffectiveAvailableHeight(defaultHeader, defaultFooter, "default", "default");
+    const effectiveAvailableHeight = calcEffectiveAvailableHeight(
+      defaultHeader,
+      defaultFooter,
+      "default",
+      "default"
+    );
 
     const pageItemGroups = paginateSectionContent(
       section,
@@ -457,7 +257,8 @@ export function buildPaginatedPages(
       effectiveAvailableHeight
     );
 
-    const pageBorders = section.pageBorders || (section.page?.borders as any) || (section.borders as any);
+    const pageBorders =
+      section.pageBorders || (section.page?.borders as any) || (section.borders as any);
 
     for (let pIdx = 0; pIdx < pageItemGroups.length; pIdx++) {
       const pageNum = pageCounter++;
@@ -472,8 +273,8 @@ export function buildPaginatedPages(
         pageFooter = firstFooter;
       } else {
         const useEven = isEvenPage && Boolean(section.evenAndOddHeaders);
-        pageHeader = (useEven && evenHeader) ? evenHeader : defaultHeader;
-        pageFooter = (useEven && evenFooter) ? evenFooter : defaultFooter;
+        pageHeader = useEven && evenHeader ? evenHeader : defaultHeader;
+        pageFooter = useEven && evenFooter ? evenFooter : defaultFooter;
       }
 
       allPages.push({

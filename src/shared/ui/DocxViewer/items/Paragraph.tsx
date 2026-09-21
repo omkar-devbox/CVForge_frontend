@@ -3,6 +3,7 @@ import type { DocxParagraph, DocxRun, DocxStyle } from "../types/docxBridge.type
 import { Run } from "./Run";
 import { useDocument } from "../context/DocumentContext";
 import { resolveFontFamily } from "../utils/fontUtils";
+import { fmtParaBorder } from "./border.utils";
 
 interface ParagraphProps {
   paragraph: DocxParagraph;
@@ -44,29 +45,6 @@ function detectHeadingLevel(styleId?: string, styleName?: string): number | null
     return null;
   };
   return check(styleId) ?? check(styleName);
-}
-
-// ─── Border style mapper ───────────────────────────────────────────────────────
-function mapBorderStyle(val: string): string {
-  switch (val) {
-    case "double": return "double";
-    case "dashed": case "dashDot": return "dashed";
-    case "dotted": return "dotted";
-    case "none": case "nil": return "none";
-    default: return "solid";
-  }
-}
-
-function fmtParaBorder(b: any): string | undefined {
-  if (!b) return undefined;
-  const val = b.val || "single";
-  if (val === "none" || val === "nil") return undefined;
-  const style = mapBorderStyle(val);
-  if (style === "none") return undefined;
-  // sz is in 1/8 pt -> px (1pt = 96/72 px = 1.333px)
-  const width = b.sz ? `${Math.max(1, Math.round((b.sz / 8) * (96 / 72)))}px` : "1px";
-  const color = b.color && b.color !== "auto" ? `#${(b.color as string).replace("#", "")}` : "#000000";
-  return `${width} ${style} ${color}`;
 }
 
 // ─── Style run defaults extractor ────────────────────────────────────────────

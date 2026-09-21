@@ -4,7 +4,9 @@ import {
   resolveSectionGeometry,
   normalizeSectionContent,
 } from "../utils/docxPaginator";
-import { ContentItemRenderer, HeaderContentRenderer, FooterContentRenderer } from "./Section";
+import { ContentItemRenderer } from "./ContentItemRenderer";
+import { HeaderContentRenderer } from "./Header";
+import { FooterContentRenderer } from "./Footer";
 
 export interface MeasuredData {
   heightsBySection: Map<number, Map<number, number>>;

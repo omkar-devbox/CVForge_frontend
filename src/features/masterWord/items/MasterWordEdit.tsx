@@ -213,7 +213,7 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
   // Determine initial document URL based on template
   const getDocumentUrl = () => {
     if (template.fileName.includes("Engine dressing conveyor") || template.id === "1") {
-      return "/documents/conveyor.docx";
+      return "/documents/Q-2026-019-Engine dressing conveyor _R0_Mar_12_26 (1) (1).docx";
     }
     if (template.fileName === "sample.docx") {
       return "/sample.docx";
@@ -259,8 +259,8 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
                 type="button"
                 onClick={() => setActiveTab("preview")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${activeTab === "preview"
-                    ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+                  ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                   }`}
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -271,8 +271,8 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
                 type="button"
                 onClick={() => setActiveTab("overview")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${activeTab === "overview"
-                    ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+                  ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                   }`}
               >
                 <Info className="w-3.5 h-3.5" />

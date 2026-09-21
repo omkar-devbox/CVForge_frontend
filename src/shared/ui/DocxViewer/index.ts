@@ -3,25 +3,36 @@ export { DocxViewer, default } from "./DocxViewer";
 export { DocxViewer as DocumentViewer } from "./DocxViewer";
 
 // Types
-export * from "./types/docxBridge.types";
+export * from "./types";
 
 // Parser — DOCX → JSON
-export { parseDocxBridgeFile } from "./parser/docxBridgeParser";
-export {
-  docxToJson,
-  docxBridgeToJsonString,
-  downloadDocxBridgeJson,
-} from "./parser/docxToJson";
+export * from "./parser";
 
-// Helpers — JSON → Viewer
-export { jsonToDocxViewerProps } from "./utils/jsonToDocxViewerProps";
+// Helpers & Utilities
+export * from "./utils";
+
+// Hooks
+export * from "./hooks";
 
 // Context (for advanced / custom rendering)
 export { DocumentProvider, useDocument } from "./context/DocumentContext";
 
 // Sub-components (for custom rendering pipelines)
-export { Section } from "./items/Section";
+export { Section, DocxPageSheet } from "./items/Section";
 export { Paragraph } from "./items/Paragraph";
 export { Run } from "./items/Run";
 export { Table } from "./items/Table";
+export { TableCell } from "./items/TableCell";
+export { Header, HeaderContentRenderer, HeaderSpacer } from "./items/Header";
+export { Footer, FooterContentRenderer, FooterSpacer } from "./items/Footer";
+export { PageBorder } from "./items/PageBorder";
+export { Watermark, findWatermarkSrc } from "./items/Watermark";
+export { ContentItemRenderer } from "./items/ContentItemRenderer";
 export { Toolbar } from "./items/Toolbar";
+export { DocxPageMeasurer } from "./items/DocxPageMeasurer";
+export { DocxPrintStyles } from "./items/DocxPrintStyles";
+export {
+  DocxLoadingState,
+  DocxErrorState,
+  DocxEmptyState,
+} from "./items/DocxStatusStates";
