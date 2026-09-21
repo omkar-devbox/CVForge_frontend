@@ -151,10 +151,13 @@ export const JsonFormRenderer: React.FC<JsonFormRendererProps> = ({
             typeof valOrEvent === "object" &&
             "target" in valOrEvent
           ) {
-            newValue =
-              valOrEvent.target.type === "checkbox"
-                ? valOrEvent.target.checked
-                : valOrEvent.target.value;
+            if (valOrEvent.target.type === "checkbox") {
+              newValue = valOrEvent.target.checked;
+            } else if (valOrEvent.target.type === "file") {
+              newValue = valOrEvent.target.files?.[0] || null;
+            } else {
+              newValue = valOrEvent.target.value;
+            }
           }
 
           onChange?.(fieldName, newValue);

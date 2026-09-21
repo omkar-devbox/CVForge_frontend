@@ -13,4 +13,5 @@ export * from "../nav";
 export * from "./Badge";
 export * from "./Modal";
 export * from "./Ai";
+export * from "./DocxViewer";
 

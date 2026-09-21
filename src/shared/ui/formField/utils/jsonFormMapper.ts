@@ -148,6 +148,8 @@ export const normalizeFieldType = (
     case "phone":
     case "tel":
       return "tel";
+    case "file":
+      return "file";
     default:
       return "text";
   }

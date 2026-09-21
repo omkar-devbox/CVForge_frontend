@@ -1,21 +1,13 @@
 import { lazy, Suspense, useMemo } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import { Loader2 } from "lucide-react";
 import { SIDEBAR_MENU } from "../menu/menuItems";
 
 // Lazy loading page components
-const DashboardPage = lazy(() => import("@/features/dashboard/dashboard"));
+const MasterWordPage = lazy(() => import("@/features/masterWord/masterWord"));
 const GenericPage = lazy(() => import("@/shared/pages/GenericPage/GenericPage"));
-const JobsPage = lazy(() => import("@/features/recruitment/jobs/jobs"));
-const ApplicationsPage = lazy(() => import("@/features/recruitment/applications/application"));
-const AllCandidatesPage = lazy(() => import("@/features/candidates/allcandidates/allcandidates"));
-const TalentPoolPage = lazy(() => import("@/features/candidates/talentpool/talentpool"));
-const UpcomingInterviewsPage = lazy(() => import("@/features/interviews/upcoming/upcoming"));
-const CompletedInterviewsPage = lazy(() => import("@/features/interviews/completed/completed"));
-const ReportsPage = lazy(() => import("@/features/reports/reports"));
-const SettingsUsersPage = lazy(() => import("@/features/settings/users/users"));
-const SettingsRolesPage = lazy(() => import("@/features/settings/rolesandpermissions/rolesandpermissions"));
+
 const UnauthorizedPage = lazy(() =>
   import("@/shared/pages/unauthorized/UnauthorizedPage")
 );
@@ -76,155 +68,23 @@ export function AppRouter() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* Dashboard */}
-        <Route
-          path="/"
-          element={
-            <MainLayout pageTitle="Dashboard" pageSubtitle="Overview & Analytics Dashboard">
-              <DashboardPage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <MainLayout pageTitle="Dashboard" pageSubtitle="Overview & Analytics Dashboard">
-              <DashboardPage />
-            </MainLayout>
-          }
-        />
+        {/* Default route redirects to Master Word */}
+        <Route path="/" element={<Navigate to="/master-word" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/master-word" replace />} />
 
-        {/* Recruitment Jobs Route */}
+        {/* Master Word */}
         <Route
-          path="/recruitment/jobs"
+          path="/master-word"
           element={
-            <MainLayout pageTitle="Jobs" pageSubtitle="Manage Job Openings & Hiring Pipeline">
-              <JobsPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Recruitment Applications Route */}
-        <Route
-          path="/recruitment/applications"
-          element={
-            <MainLayout pageTitle="Applications" pageSubtitle="Candidate Applications & Hiring Stages">
-              <ApplicationsPage />
-            </MainLayout>
-          }
-        />
-
-        {/* All Candidates Routes */}
-        <Route
-          path="/candidates/all"
-          element={
-            <MainLayout pageTitle="All Candidates" pageSubtitle="Manage Candidate Profiles & Talent Database">
-              <AllCandidatesPage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/candidates/allcandidates"
-          element={
-            <MainLayout pageTitle="All Candidates" pageSubtitle="Manage Candidate Profiles & Talent Database">
-              <AllCandidatesPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Talent Pool Routes */}
-        <Route
-          path="/candidates/talent-pool"
-          element={
-            <MainLayout pageTitle="Talent Pool" pageSubtitle="Curate, organize, and fast-track high-potential pre-vetted candidates">
-              <TalentPoolPage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/candidates/talentpool"
-          element={
-            <MainLayout pageTitle="Talent Pool" pageSubtitle="Curate, organize, and fast-track high-potential pre-vetted candidates">
-              <TalentPoolPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Upcoming Interviews Route */}
-        <Route
-          path="/interviews/upcoming"
-          element={
-            <MainLayout pageTitle="Upcoming Interviews" pageSubtitle="Schedule, manage, and conduct upcoming candidate interviews">
-              <UpcomingInterviewsPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Completed Interviews Route */}
-        <Route
-          path="/interviews/completed"
-          element={
-            <MainLayout pageTitle="Completed Interviews" pageSubtitle="Review interview scorecards, candidate evaluations, and hiring recommendations">
-              <CompletedInterviewsPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Reports Route */}
-        <Route
-          path="/reports"
-          element={
-            <MainLayout pageTitle="Reports" pageSubtitle="Analytics, Metrics & Hiring Pipeline Performance Reports">
-              <ReportsPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Settings / Users Route */}
-        <Route
-          path="/settings/users"
-          element={
-            <MainLayout pageTitle="User Management" pageSubtitle="Manage organization team members, access permissions, and security">
-              <SettingsUsersPage />
-            </MainLayout>
-          }
-        />
-
-        {/* Settings / Roles & Permissions Route */}
-        <Route
-          path="/settings/roles-permissions"
-          element={
-            <MainLayout pageTitle="Roles & Permissions" pageSubtitle="Manage access control, permission matrices, and user security policies">
-              <SettingsRolesPage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/settings/rolesandpermissions"
-          element={
-            <MainLayout pageTitle="Roles & Permissions" pageSubtitle="Manage access control, permission matrices, and user security policies">
-              <SettingsRolesPage />
+            <MainLayout pageTitle="Master Word Templates" pageSubtitle="Manage Master Word Templates">
+              <MasterWordPage />
             </MainLayout>
           }
         />
 
         {/* Dynamic Sidebar Module & Settings Routes */}
         {moduleRoutes
-          .filter(
-            (route) =>
-              route.path !== "/recruitment/jobs" &&
-              route.path !== "/recruitment/applications" &&
-              route.path !== "/candidates/all" &&
-              route.path !== "/candidates/allcandidates" &&
-              route.path !== "/candidates/talent-pool" &&
-              route.path !== "/candidates/talentpool" &&
-              route.path !== "/interviews/upcoming" &&
-              route.path !== "/interviews/completed" &&
-              route.path !== "/reports" &&
-              route.path !== "/settings/users" &&
-              route.path !== "/settings/roles-permissions" &&
-              route.path !== "/settings/rolesandpermissions"
-          )
+          .filter((route) => route.path !== "/master-word")
           .map((route) => (
             <Route
               key={route.path}

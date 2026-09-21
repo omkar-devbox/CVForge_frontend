@@ -7,6 +7,7 @@ import { TextAreaField } from "./BaseFields/TextAreaField";
 import { CheckboxField } from "./BaseFields/CheckboxField";
 import { RadioField } from "./BaseFields/RadioField";
 import { InputField } from "./BaseFields/InputField";
+import { FileUploadField } from "./BaseFields/FileUploadField";
 import { checkFieldAccess } from "../utils/permissionUtils";
 import type {
   FormFieldProps,
@@ -190,6 +191,19 @@ export const FormField = forwardRef<
             labelKey={labelKey}
             valueKey={valueKey}
             styleConfig={styleConfig}
+          />
+        );
+
+      case "file":
+        return (
+          <FileUploadField
+            {...(rest as any)}
+            ref={ref as React.ForwardedRef<HTMLInputElement>}
+            id={id}
+            name={name}
+            disabled={disabled}
+            required={required}
+            error={error}
           />
         );
 

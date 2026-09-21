@@ -46,7 +46,7 @@ export const NotFoundCard: FC = () => {
               className={notFoundStyles.dashboardButton}
             >
               <Home size={20} />
-              Return to Dashboard
+              Return to Home
             </Button>
           </Link>
         </div>

@@ -1,17 +1,4 @@
-import {
-  LayoutDashboard,
-  Briefcase,
-  FileText,
-  Users,
-  Sparkles,
-  CalendarCheck2,
-  CalendarClock,
-  CalendarCheck,
-  BarChart3,
-  Settings,
-  UserCog,
-  ShieldCheck,
-} from "lucide-react";
+import { FileText } from "lucide-react";
 import type { MenuSection, MenuItem } from "@/shared/nav/Sidebar/types/types";
 
 // ==================== Sidebar Menu ====================
@@ -20,140 +7,18 @@ export const SIDEBAR_MENU: MenuSection[] = [
   {
     id: "overview-section",
     label: "Overview",
-    description: "Main overview & metrics",
+    description: "Main overview & templates",
     items: [
       {
-        id: "dashboard",
-        key: "dashboard",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        path: "/",
-        tooltip: "Overview & Analytics Dashboard",
+        id: "master-word",
+        key: "master-word",
+        label: "Master Word",
+        icon: FileText,
+        path: "/master-word",
+        tooltip: "Manage Master Word Templates",
       },
     ],
   },
-  {
-    id: "recruitment-section",
-    label: "Recruitment",
-    description: "Recruitment & candidate pipeline",
-    items: [
-      // {
-      //   id: "recruitment",
-      //   key: "recruitment",
-      //   label: "Recruitment",
-      //   icon: Briefcase,
-      //   tooltip: "Recruitment & hiring workflow",
-      //   children: [
-      //     {
-      //       id: "recruitment-jobs",
-      //       key: "jobs",
-      //       label: "Jobs",
-      //       icon: Briefcase,
-      //       path: "/recruitment/jobs",
-      //       tooltip: "Manage Job Openings",
-      //     },
-      //     {
-      //       id: "recruitment-applications",
-      //       key: "applications",
-      //       label: "Applications",
-      //       icon: FileText,
-      //       path: "/recruitment/applications",
-      //       tooltip: "Candidate Applications",
-      //     },
-      //   ],
-      // },
-      {
-        id: "candidates",
-        key: "candidates",
-        label: "Candidates",
-        icon: Users,
-        tooltip: "Candidate Management",
-        children: [
-          {
-            id: "candidates-all",
-            key: "all-candidates",
-            label: "All Candidates",
-            icon: Users,
-            path: "/candidates/all",
-            tooltip: "All Candidates Database",
-          },
-          // {
-          //   id: "candidates-talent-pool",
-          //   key: "talent-pool",
-          //   label: "Talent Pool",
-          //   icon: Sparkles,
-          //   path: "/candidates/talent-pool",
-          //   tooltip: "Curated Talent Pool",
-          // },
-        ],
-      },
-      // {
-      //   id: "interviews",
-      //   key: "interviews",
-      //   label: "Interviews",
-      //   icon: CalendarCheck2,
-      //   tooltip: "Interview Scheduling & Tracking",
-      //   children: [
-      //     {
-      //       id: "interviews-upcoming",
-      //       key: "upcoming",
-      //       label: "Upcoming",
-      //       icon: CalendarClock,
-      //       path: "/interviews/upcoming",
-      //       tooltip: "Scheduled Upcoming Interviews",
-      //     },
-      //     {
-      //       id: "interviews-completed",
-      //       key: "completed",
-      //       label: "Completed",
-      //       icon: CalendarCheck,
-      //       path: "/interviews/completed",
-      //       tooltip: "Completed Interview Logs & Feedback",
-      //     },
-      //   ],
-      // },
-    ],
-  },
-  // {
-  //   id: "management-section",
-  //   label: "Management",
-  //   description: "Analytics & system settings",
-  //   items: [
-  //     {
-  //       id: "reports",
-  //       key: "reports",
-  //       label: "Reports",
-  //       icon: BarChart3,
-  //       path: "/reports",
-  //       tooltip: "Analytics, Metrics & Reports",
-  //     },
-  //     {
-  //       id: "settings",
-  //       key: "settings",
-  //       label: "Settings",
-  //       icon: Settings,
-  //       tooltip: "System Configurations & Preferences",
-  //       children: [
-  //         {
-  //           id: "settings-users",
-  //           key: "users",
-  //           label: "Users",
-  //           icon: UserCog,
-  //           path: "/settings/users",
-  //           tooltip: "User Management & Accounts",
-  //         },
-  //         {
-  //           id: "settings-roles",
-  //           key: "roles-permissions",
-  //           label: "Roles & Permissions",
-  //           icon: ShieldCheck,
-  //           path: "/settings/roles-permissions",
-  //           tooltip: "Access Control & Permissions",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
 ];
 
 // ==================== Sidebar Configuration ====================

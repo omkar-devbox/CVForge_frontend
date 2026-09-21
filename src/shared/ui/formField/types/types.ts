@@ -232,6 +232,19 @@ export interface DateFieldProps
   minView?: DatePickerView;
 }
 
+/* ── File ───────────────────────────────────────────── */
+
+export interface FileFieldProps
+  extends
+  Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type" | "size" | "value" | "defaultValue" | "onChange" | "prefix"
+  >,
+  BaseFormFieldProps<"file", File | File[] | null> {
+  accept?: string;
+  onFileSelect?: (file: File | null) => void;
+}
+
 /* ── Final Union ───────────────────────────────────────── */
 
 export type FormFieldProps =
@@ -240,7 +253,8 @@ export type FormFieldProps =
   | SelectFieldProps
   | CheckboxFieldProps
   | RadioFieldProps
-  | DateFieldProps;
+  | DateFieldProps
+  | FileFieldProps;
 
 /* ── Utility ─────────────────────────────────────────── */
 
@@ -260,6 +274,7 @@ export type JsonFieldType =
   | "checkbox"
   | "radio"
   | "date"
+  | "file"
   // Legacy / Backend format strings:
   | "String (Text)"
   | "Select"
