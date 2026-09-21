@@ -37,6 +37,7 @@ interface DynamicFieldModalProps {
   isOpen: boolean;
   onClose: () => void;
   field?: DynamicField | null;
+  isExisting?: boolean;
   onSave: (field: DynamicField) => void;
   onDelete?: (id: string) => void;
 }
@@ -53,13 +54,18 @@ export const DynamicFieldModal: React.FC<DynamicFieldModalProps> = ({
   isOpen,
   onClose,
   field,
+  isExisting,
   onSave,
   onDelete,
 }) => {
-  const isEditing = !!field;
+  const isEditing =
+    isExisting !== undefined
+      ? isExisting
+      : !!field && !field.id?.startsWith("field_candidate_");
 
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
+  const [value, setValue] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<DynamicFieldType>("text");
   const [columns, setColumns] = useState<DynamicTableColumn[]>([
@@ -72,6 +78,7 @@ export const DynamicFieldModal: React.FC<DynamicFieldModalProps> = ({
     if (field) {
       setName(field.name || "");
       setKey(field.key || "");
+      setValue(field.value || "");
       setDescription(field.description || "");
       setType(field.type || "text");
       if (field.columns && field.columns.length > 0) {
@@ -85,6 +92,7 @@ export const DynamicFieldModal: React.FC<DynamicFieldModalProps> = ({
     } else {
       setName("");
       setKey("");
+      setValue("");
       setDescription("");
       setType("text");
       setColumns([
@@ -97,7 +105,7 @@ export const DynamicFieldModal: React.FC<DynamicFieldModalProps> = ({
   // Automatically update key when name changes if user hasn't explicitly customized key
   const handleNameChange = (val: string) => {
     setName(val);
-    if (!field) {
+    if (!field || field.id?.startsWith("field_candidate_")) {
       const generatedKey = `{{${val.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/^_+|_+$/g, "")}}}`;
       setKey(generatedKey);
     }
@@ -153,7 +161,7 @@ export const DynamicFieldModal: React.FC<DynamicFieldModalProps> = ({
       description: description.trim(),
       type,
       columns: type === "table" ? columns : undefined,
-      value: field?.value,
+      value: value.trim() || undefined,
       color: type === "image" ? "emerald" : type === "date" ? "orange" : type === "number" ? "blue" : type === "table" ? "indigo" : "purple",
     };
 
@@ -261,6 +269,62 @@ export const DynamicFieldModal: React.FC<DynamicFieldModalProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Sample / Default Value - for scalar types */}
+          {type !== "table" && (
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                {type === "image" ? "Image Source / Asset URL:" : "Sample / Default Value:"}
+              </label>
+              <input
+                type="text"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder={
+                  type === "image"
+                    ? "e.g. blob:... or https://example.com/logo.png"
+                    : "e.g. Q-2026-019-R0 or Standard Text"
+                }
+                className="w-full text-xs p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-800 dark:text-slate-200 font-mono"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">
+                {type === "image"
+                  ? "Image asset URL or blob reference used when rendering this placeholder in documents."
+                  : "Example or initial value used when rendering this placeholder in documents."}
+              </p>
+            </div>
+          )}
+
+          {/* Live Image Preview if Image type */}
+          {type === "image" && value && (
+            <div className="p-3 bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-3.5 animate-in fade-in duration-200">
+              <div className="w-16 h-16 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1 shrink-0 shadow-2xs">
+                <img
+                  src={value}
+                  alt="Dynamic Preview"
+                  className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = "none";
+                  }}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                    Graphic Asset Preview
+                  </span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-bold uppercase">
+                    Image
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 truncate mt-1 font-mono">
+                  {value.startsWith("blob:") || value.startsWith("data:")
+                    ? "Embedded Document Graphic Part"
+                    : value}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Table Columns Section - Only shown when Table type is selected */}
           {type === "table" && (

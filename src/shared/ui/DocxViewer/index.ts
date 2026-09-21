@@ -36,3 +36,12 @@ export {
   DocxErrorState,
   DocxEmptyState,
 } from "./items/DocxStatusStates";
+export {
+  DocxSelectionFloatingAction,
+  DynamicSparklePencilIcon,
+} from "./items/DocxSelectionFloatingAction";
+export type {
+  DocxSelectionFloatingActionProps,
+  DocxSelectionContext,
+  DocxSelectionColumn,
+} from "./items/DocxSelectionFloatingAction";

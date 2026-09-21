@@ -19,8 +19,12 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import type { TemplateRecord } from "../types/masterWord.types";
-import { DynamicFieldModal, DynamicField } from "./DynamicFieldModal";
-import { DocxViewer } from "./DocxViewer";
+import { DynamicFieldModal, DynamicField, DynamicFieldType } from "./DynamicFieldModal";
+import {
+  DocxViewer,
+  type DocxSelectionContext,
+  type DocxSelectionColumn,
+} from "./DocxViewer";
 
 interface MasterWordEditProps {
   template: TemplateRecord;
@@ -93,6 +97,14 @@ const INITIAL_FIELDS: DynamicField[] = [
     color: "orange",
   },
   {
+    id: "f_company_logo",
+    name: "Company Logo",
+    key: "{{company_logo}}",
+    type: "image",
+    description: "Header company logo or brand graphic",
+    color: "emerald",
+  },
+  {
     id: "f_specs_table",
     name: "RFQ Specifications",
     key: "{{rfq_specifications}}",
@@ -150,6 +162,242 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
 
   const handleDeleteField = (id: string) => {
     setDynamicFields((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  // Triggered when user selects text or clicks an image/table in DocxViewer
+  const handleTextSelectionAction = (
+    selectedText: string,
+    _rect?: DOMRect,
+    context?: DocxSelectionContext
+  ) => {
+    // ── 0. Image Detection: when clicking or hovering on an image in the document ──
+    if (context?.isImage) {
+      const imgName = context.imageName?.trim() || "Company Logo";
+      const imgSrc = context.imageSrc || "";
+      const cleanImgName = imgName.toLowerCase();
+      const cleanImgKey = cleanImgName.replace(/[^a-z0-9]/g, "_").replace(/^_+|_+$/g, "");
+
+      // Check if an existing image dynamic field matches
+      const existingImage = dynamicFields.find((f) => {
+        if (f.type !== "image") return false;
+        if (f.value && imgSrc && f.value === imgSrc) return true;
+        if (f.name.toLowerCase() === cleanImgName) return true;
+        if (cleanImgKey && f.key.replace(/[{}]/g, "").toLowerCase() === cleanImgKey) return true;
+        return false;
+      });
+
+      if (existingImage) {
+        if (!existingImage.value && imgSrc) {
+          handleOpenEditModal({ ...existingImage, value: imgSrc });
+        } else {
+          handleOpenEditModal(existingImage);
+        }
+        return;
+      }
+
+      const generatedKey = `{{${cleanImgKey || "company_logo"}}}`;
+
+      const candidateImageField: DynamicField = {
+        id: `field_candidate_${Date.now()}`,
+        name: imgName,
+        key: generatedKey,
+        type: "image",
+        value: imgSrc,
+        description: `Dynamic graphic placeholder for ${imgName}`,
+        color: "emerald",
+      };
+
+      setSelectedField(candidateImageField);
+      setIsModalOpen(true);
+      return;
+    }
+
+    const trimmed = selectedText.trim();
+    if (!trimmed) return;
+
+    const cleanLower = trimmed.toLowerCase();
+
+    // Check if user selected text that contains a colon or key-value format (e.g. "32. Quotation Reference : As per received...")
+    const hasColon = trimmed.includes(":") || trimmed.includes(" - ");
+    const isSentence = trimmed.includes(". ") || trimmed.length > 80;
+
+    // ── 1. Table Detection: ONLY when hovering table header or explicitly selecting table header ──
+    const isTableAction = Boolean(
+      (context?.fromHeaderHover && context?.columns && context.columns.length >= 2) ||
+      (context?.isTable && context?.isHeaderRow && !hasColon && !isSentence && context?.columns && context.columns.length >= 2)
+    );
+
+    if (isTableAction && context?.columns && context.columns.length >= 2) {
+      const extractedCols: DocxSelectionColumn[] = context.columns;
+
+      // Field Name: set to the main header situated above the table!
+      let tableName = context.tableName?.trim();
+      if (!tableName) {
+        const colNamesLower = extractedCols.map((c: DocxSelectionColumn) => c.name.toLowerCase());
+        if (colNamesLower.some((n: string) => n.includes("spec") || n.includes("item") || n.includes("equipment"))) {
+          tableName = "RFQ Specifications";
+        } else if (colNamesLower.some((n: string) => n.includes("price") || n.includes("cost") || n.includes("amount") || n.includes("commercial"))) {
+          tableName = "Commercial Details";
+        } else {
+          tableName = "Table Specifications";
+        }
+      }
+
+      // Check if an existing table dynamic field matches
+      const existingTable = dynamicFields.find((f) => {
+        if (f.type !== "table" || !f.columns) return false;
+
+        // Check if field name matches table header above table or selected text
+        if (
+          (tableName && f.name.toLowerCase() === tableName.toLowerCase()) ||
+          f.name.toLowerCase() === cleanLower ||
+          f.key.replace(/[{}]/g, "").toLowerCase() === cleanLower
+        ) {
+          return true;
+        }
+
+        // Check if context columns overlap with existing field columns
+        if (extractedCols.length > 0) {
+          const colMatches = extractedCols.filter((c: DocxSelectionColumn) =>
+            f.columns?.some(
+              (fc) =>
+                fc.name.toLowerCase() === c.name.toLowerCase() ||
+                fc.key.toLowerCase() === c.key.toLowerCase()
+            )
+          );
+          if (colMatches.length >= Math.min(2, f.columns.length)) {
+            return true;
+          }
+        }
+
+        return false;
+      });
+
+      if (existingTable) {
+        handleOpenEditModal(existingTable);
+        return;
+      }
+
+      // Create a new candidate Table DynamicField using the main header above table as Field Name
+      const tableKey = `{{${tableName.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/^_+|_+$/g, "")}}}`;
+
+      const candidateTableField: DynamicField = {
+        id: `field_candidate_${Date.now()}`,
+        name: tableName,
+        key: tableKey,
+        type: "table",
+        columns: extractedCols.map((c: DocxSelectionColumn, i: number) => ({
+          id: c.id || `col_${Date.now()}_${i + 1}`,
+          name: c.name,
+          key: c.key || c.name.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/^_+|_+$/g, "") || `col_${i + 1}`,
+          type: c.type || "text",
+        })),
+        description: `Dynamic table with ${extractedCols.length} columns (${extractedCols.map((c: DocxSelectionColumn) => c.name).join(", ")})`,
+        color: "indigo",
+      };
+
+      setSelectedField(candidateTableField);
+      setIsModalOpen(true);
+      return;
+    }
+
+    // ── 2. Scalar Field Parsing (Text, Date, Number, Image) ─────────
+    let fieldName = trimmed;
+    let fieldValue = trimmed;
+    let fieldType: DynamicFieldType = "text";
+
+    if (hasColon) {
+      const splitChar = trimmed.includes(":") ? ":" : " - ";
+      const firstColonIdx = trimmed.indexOf(splitChar);
+      const rawLeft = trimmed.slice(0, firstColonIdx).trim();
+      const rawRight = trimmed.slice(firstColonIdx + splitChar.length).trim();
+
+      if (rawLeft && rawRight) {
+        // Strip leading numbers like "32. ", "1. ", "a) "
+        fieldName = rawLeft.replace(/^[0-9]+(\.[0-9]+)*[.)\s-]+/, "").trim() || rawLeft;
+        fieldValue = rawRight;
+      }
+    } else {
+      // Strip leading numbers like "32. ", "1. "
+      fieldName = trimmed.replace(/^[0-9]+(\.[0-9]+)*[.)\s-]+/, "").trim() || trimmed;
+    }
+
+    // Shorten fieldName if it's too long
+    if (fieldName.length > 40) {
+      fieldName = fieldName.slice(0, 37) + "...";
+    }
+
+    // Check if an existing scalar dynamic field matches
+    const cleanNameLower = fieldName.toLowerCase();
+    const cleanValueLower = fieldValue.toLowerCase();
+
+    let matched = dynamicFields.find((f) => {
+      if (f.type === "table") return false;
+      const fVal = f.value?.trim().toLowerCase();
+      const fKey = f.key.replace(/[{}]/g, "").trim().toLowerCase();
+      const fName = f.name.trim().toLowerCase();
+
+      return (
+        (fVal && (fVal === cleanValueLower || cleanValueLower === fVal)) ||
+        fKey === cleanNameLower ||
+        fName === cleanNameLower
+      );
+    });
+
+    if (!matched) {
+      matched = dynamicFields.find((f) => {
+        if (f.type === "table") return false;
+        const fVal = f.value?.trim().toLowerCase();
+        if (fVal && fVal.length >= 3 && cleanValueLower.includes(fVal)) return true;
+        if (fVal && cleanValueLower.length >= 3 && fVal.includes(cleanValueLower)) return true;
+        return false;
+      });
+    }
+
+    if (matched) {
+      handleOpenEditModal(matched);
+      return;
+    }
+
+    // Intelligent type detection
+    const dateRegex = /^\d{1,4}[./-]\d{1,2}[./-]\d{2,4}$/;
+    const numberRegex = /^\$?\d+([,.]\d+)?%?$/;
+    if (dateRegex.test(fieldValue) || dateRegex.test(trimmed)) {
+      fieldType = "date";
+    } else if (numberRegex.test(fieldValue.replace(/,/g, "")) || numberRegex.test(trimmed.replace(/,/g, ""))) {
+      fieldType = "number";
+    } else if (
+      fieldValue.startsWith("http") &&
+      (fieldValue.endsWith(".png") || fieldValue.endsWith(".jpg") || fieldValue.endsWith(".jpeg"))
+    ) {
+      fieldType = "image";
+    }
+
+    const cleanKeyBase = fieldName
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "_")
+      .replace(/^_+|_+$/g, "");
+    const generatedKey = `{{${cleanKeyBase || "custom_field"}}}`;
+
+    const candidateField: DynamicField = {
+      id: `field_candidate_${Date.now()}`,
+      name: fieldName,
+      key: generatedKey,
+      type: fieldType,
+      value: fieldValue,
+      description: `Dynamic placeholder for ${fieldName}`,
+      color:
+        fieldType === "date"
+          ? "amber"
+          : fieldType === "number"
+            ? "orange"
+            : fieldType === "image"
+              ? "emerald"
+              : "blue",
+    };
+
+    setSelectedField(candidateField);
+    setIsModalOpen(true);
   };
 
   // Quick AI Assistant action at top of sidebar
@@ -297,6 +545,8 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
               fileUrl={getDocumentUrl()}
               fileName={template.fileName}
               className="h-full"
+              onTextSelectionAction={handleTextSelectionAction}
+              selectionActionTooltip="Add / Edit Dynamic Field"
             />
           </div>
         )}
@@ -508,6 +758,26 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
                     </div>
                   )}
 
+                  {field.type === "image" && field.value && (
+                    <div className="mt-2 mb-1 flex items-center gap-2 p-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                      <div className="w-8 h-8 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                        <img
+                          src={field.value}
+                          alt={field.name}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = "none";
+                          }}
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate">
+                        {field.value.startsWith("blob:") || field.value.startsWith("data:")
+                          ? "Embedded Graphic Part"
+                          : field.value}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-900">
                     <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate font-medium flex-1">
                       {field.value || <span className="text-slate-400 font-mono text-[10px]">{field.key}</span>}
@@ -564,6 +834,7 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         field={selectedField}
+        isExisting={selectedField ? dynamicFields.some((f) => f.id === selectedField.id) : false}
         onSave={handleSaveField}
         onDelete={handleDeleteField}
       />

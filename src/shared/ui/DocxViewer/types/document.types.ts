@@ -10,6 +10,7 @@ import type {
   DocxNumberingData,
   DocxRelation,
 } from "./style.types";
+import type { DocxSelectionContext } from "../items/DocxSelectionFloatingAction";
 
 export interface DocxPageMargins {
   top?: number;
@@ -134,4 +135,28 @@ export interface DocxViewerProps {
    * Defaults to true.
    */
   showWatermark?: boolean;
+  /**
+   * Callback fired when text selection floating action is clicked.
+   * Receives the selected text string, selection DOMRect, and optional selection context (table, columns, etc.).
+   */
+  onTextSelectionAction?: (
+    selectedText: string,
+    rect?: DOMRect,
+    context?: DocxSelectionContext
+  ) => void;
+  /**
+   * Tooltip label for the floating action button.
+   * Defaults to "Add Dynamic Field".
+   */
+  selectionActionTooltip?: string;
+  /**
+   * Custom icon element for the selection action button.
+   * If omitted, renders the circular sparkle pencil dynamic edit button.
+   */
+  selectionActionIcon?: React.ReactNode;
+  /**
+   * When true, shows the dynamic floating button upon text selection.
+   * Defaults to true when onTextSelectionAction is provided.
+   */
+  enableSelectionAction?: boolean;
 }

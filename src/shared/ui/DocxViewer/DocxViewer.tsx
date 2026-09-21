@@ -13,6 +13,7 @@ import {
 import { buildPaginatedPages } from "./utils/docxPaginator";
 import { useDocxLoader } from "./hooks/useDocxLoader";
 import { useDocxViewerControls } from "./hooks/useDocxViewerControls";
+import { DocxSelectionFloatingAction } from "./items/DocxSelectionFloatingAction";
 
 export const DocxViewer: React.FC<DocxViewerProps> = ({
   fileUrl,
@@ -27,6 +28,10 @@ export const DocxViewer: React.FC<DocxViewerProps> = ({
   showJsonExport = false,
   showPageNumberPill = false,
   showWatermark = true,
+  onTextSelectionAction,
+  selectionActionTooltip = "Add Dynamic Field",
+  selectionActionIcon,
+  enableSelectionAction,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -190,6 +195,19 @@ export const DocxViewer: React.FC<DocxViewerProps> = ({
           </DocumentProvider>
         )}
       </div>
+
+      {/* Floating Dynamic Action Button on Text Selection */}
+      {(enableSelectionAction ?? !!onTextSelectionAction) && (
+        <DocxSelectionFloatingAction
+          containerRef={containerRef}
+          scrollContainerRef={scrollContainerRef}
+          onAction={(text, rect, context) => {
+            onTextSelectionAction?.(text, rect, context);
+          }}
+          tooltip={selectionActionTooltip}
+          icon={selectionActionIcon}
+        />
+      )}
     </div>
   );
 };

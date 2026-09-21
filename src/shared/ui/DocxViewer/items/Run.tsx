@@ -232,8 +232,10 @@ const DrawingItem: React.FC<{
     <img
       src={src}
       alt={drawing.name || "Embedded Document Graphic"}
+      data-drawing-name={drawing.name || ""}
       style={imgStyle}
-      className="inline-block"
+      draggable={false}
+      className="inline-block docx-drawing-img hover:opacity-95 transition-opacity cursor-pointer hover:ring-2 hover:ring-blue-400/50 rounded-xs"
       loading="eager"
     />
   );

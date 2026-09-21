@@ -51,3 +51,14 @@ export {
   DocxEmptyState,
 } from "./DocxStatusStates";
 export type { DocxErrorStateProps } from "./DocxStatusStates";
+
+// Text Selection Floating Action
+export {
+  DocxSelectionFloatingAction,
+  DynamicSparklePencilIcon,
+} from "./DocxSelectionFloatingAction";
+export type {
+  DocxSelectionFloatingActionProps,
+  DocxSelectionContext,
+  DocxSelectionColumn,
+} from "./DocxSelectionFloatingAction";
