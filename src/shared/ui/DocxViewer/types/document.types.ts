@@ -108,6 +108,8 @@ export interface DocxViewerProps {
   fileName?: string;
   /** Whether to render top toolbar with zoom, page navigation, download, etc. */
   showToolbar?: boolean;
+  /** Whether to show document name and icon in the toolbar. Defaults to true. */
+  showFileName?: boolean;
   /** Custom wrapper CSS class name */
   className?: string;
   /** Callback fired when document finishes parsing/loading */

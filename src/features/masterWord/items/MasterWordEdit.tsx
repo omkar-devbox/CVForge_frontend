@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Sparkles,
-  Bot,
   ListPlus,
   Type,
   Hash,
@@ -10,7 +9,6 @@ import {
   Plus,
   Image as ImageIcon,
   Table as TableIcon,
-  Loader2,
   FileText,
   Copy,
   Check,
@@ -134,10 +132,6 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
   const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(INITIAL_FIELDS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<DynamicField | null>(null);
-
-  // Top AI Assistant input
-  const [aiAssistantPrompt, setAiAssistantPrompt] = useState("");
-  const [isAiProcessing, setIsAiProcessing] = useState(false);
 
   const handleOpenCreateModal = () => {
     setSelectedField(null);
@@ -400,49 +394,6 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
     setIsModalOpen(true);
   };
 
-  // Quick AI Assistant action at top of sidebar
-  const handleTopAiSubmit = () => {
-    if (!aiAssistantPrompt.trim()) return;
-    setIsAiProcessing(true);
-
-    setTimeout(() => {
-      setIsAiProcessing(false);
-      const prompt = aiAssistantPrompt.toLowerCase();
-      const isPhoto = prompt.includes("photo") || prompt.includes("image");
-      const isDate = prompt.includes("date");
-      const isNumber = prompt.includes("salary") || prompt.includes("amount") || prompt.includes("number");
-
-      const newField: DynamicField = {
-        id: `field_${Date.now()}`,
-        name: isPhoto
-          ? "Candidate Photograph"
-          : isDate
-            ? "Joining Date"
-            : isNumber
-              ? "Expected Salary"
-              : "Candidate Experience",
-        key: isPhoto
-          ? "{{candidate_photograph}}"
-          : isDate
-            ? "{{joining_date}}"
-            : isNumber
-              ? "{{expected_salary}}"
-              : "{{candidate_experience}}",
-        type: isPhoto ? "image" : isDate ? "date" : isNumber ? "number" : "text",
-        description: isPhoto
-          ? "Uploaded formal passport photo"
-          : "AI generated dynamic template field",
-        value: isPhoto
-          ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
-          : "Standard Value",
-        color: isPhoto ? "emerald" : "blue",
-      };
-      handleSaveField(newField);
-      handleOpenEditModal(newField);
-      setAiAssistantPrompt("");
-    }, 800);
-  };
-
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "image":
@@ -544,6 +495,7 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
             <DocxViewer
               fileUrl={getDocumentUrl()}
               fileName={template.fileName}
+              showFileName={false}
               className="h-full"
               onTextSelectionAction={handleTextSelectionAction}
               selectionActionTooltip="Add / Edit Dynamic Field"
@@ -637,43 +589,8 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
         )}
       </div>
 
-      {/* Right Sidebar - Dynamic Fields & AI */}
+      {/* Right Sidebar - Dynamic Fields */}
       <div className="w-80 md:w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)] z-10 overflow-hidden">
-        {/* AI Feature Header */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-br from-indigo-50/80 via-blue-50/50 to-white dark:from-indigo-900/20 dark:via-blue-900/10 dark:to-slate-900 relative">
-          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-            <Bot size={70} />
-          </div>
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold mb-1 relative z-10">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-xs">AI Assistant</span>
-          </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2 relative z-10">
-            Prompt AI to create template variables automatically.
-          </p>
-          <div className="relative z-10">
-            <textarea
-              value={aiAssistantPrompt}
-              onChange={(e) => setAiAssistantPrompt(e.target.value)}
-              className="w-full bg-white dark:bg-slate-950 border border-indigo-100 dark:border-indigo-900/50 rounded-lg text-xs p-2.5 pr-8 focus:ring-2 focus:ring-indigo-500/50 outline-none resize-none h-16 placeholder:text-slate-400 text-slate-800 dark:text-slate-200 shadow-2xs"
-              placeholder="e.g. Create photo field or expected salary..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleTopAiSubmit();
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleTopAiSubmit}
-              disabled={isAiProcessing || !aiAssistantPrompt.trim()}
-              className="absolute bottom-2.5 right-2 text-white bg-indigo-600 hover:bg-indigo-700 p-1 rounded-md transition-all shadow-sm disabled:opacity-50"
-            >
-              {isAiProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Bot className="w-3.5 h-3.5" />}
-            </button>
-          </div>
-        </div>
 
         {/* Dynamic Fields Section */}
         <div className="flex-1 overflow-y-auto p-4 bg-slate-50/50 dark:bg-slate-900/50">

@@ -1,12 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ZoomIn,
   ZoomOut,
   Maximize2,
   Minimize2,
-  Printer,
   Download,
-  Upload,
   FileText,
   RotateCcw,
   ChevronLeft,
@@ -17,6 +15,7 @@ import {
 
 interface ToolbarProps {
   fileName?: string;
+  showFileName?: boolean;
   currentPage: number;
   totalPages: number;
   zoom: number;
@@ -27,7 +26,7 @@ interface ToolbarProps {
   onZoomReset: () => void;
   onFitWidth: () => void;
   onToggleFullScreen: () => void;
-  onPrint: () => void;
+  onPrint?: () => void;
   onDownload?: () => void;
   onFileSelect?: (file: File) => void;
   /** Called when user clicks the Export JSON button. If undefined, button is hidden. */
@@ -38,6 +37,7 @@ interface ToolbarProps {
 
 export const Toolbar: React.FC<ToolbarProps> = ({
   fileName = "Document.docx",
+  showFileName = true,
   currentPage,
   totalPages,
   zoom,
@@ -50,12 +50,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onToggleFullScreen,
   onPrint,
   onDownload,
-  onFileSelect,
   onJsonExport,
   showJsonExportBtn = false,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [pageInput, setPageInput] = useState<string>(String(currentPage));
 
   useEffect(() => {
@@ -72,47 +69,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     }
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onFileSelect) {
-      onFileSelect(file);
-    }
-  };
-
   return (
     <div className="docx-toolbar w-full flex items-center justify-between px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-2xs z-30 select-none">
-      {/* Left: Document Name and Open button */}
-      <div className="flex items-center gap-2.5 min-w-0">
-        <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/50">
-          <FileText className="w-4 h-4" />
-        </div>
-        <span
-          className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[200px] sm:max-w-xs"
-          title={fileName}
-        >
-          {fileName}
-        </span>
-
-        {/* Hidden file input for opening DOCX */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".docx,.json"
-          onChange={handleFileInputChange}
-          className="hidden"
-        />
-
-        {onFileSelect && (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            title="Open another DOCX file"
-            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+      {/* Left: Document Name */}
+      {showFileName && fileName ? (
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/50">
+            <FileText className="w-4 h-4" />
+          </div>
+          <span
+            className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[200px] sm:max-w-xs"
+            title={fileName}
           >
-            <Upload className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+            {fileName}
+          </span>
+        </div>
+      ) : (
+        <div className="min-w-0" />
+      )}
 
       {/* Center: Page Navigation */}
       <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg p-0.5 border border-slate-200/60 dark:border-slate-700/60">
@@ -206,15 +180,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-0.5" />
 
-        {/* Print */}
-        <button
-          type="button"
-          onClick={onPrint}
-          title="Print Document"
-          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-        >
-          <Printer className="w-4 h-4" />
-        </button>
+
 
         {/* Export JSON */}
         {onJsonExport && showJsonExportBtn && (

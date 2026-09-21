@@ -21,6 +21,7 @@ export const DocxViewer: React.FC<DocxViewerProps> = ({
   data,
   fileName = "Document.docx",
   showToolbar = true,
+  showFileName = true,
   className = "",
   onLoad,
   onError,
@@ -125,6 +126,7 @@ export const DocxViewer: React.FC<DocxViewerProps> = ({
       {showToolbar && (
         <Toolbar
           fileName={fileName}
+          showFileName={showFileName}
           currentPage={currentPage}
           totalPages={totalPages}
           zoom={zoom}
@@ -137,7 +139,6 @@ export const DocxViewer: React.FC<DocxViewerProps> = ({
           onToggleFullScreen={handleToggleFullScreen}
           onPrint={handlePrint}
           onDownload={fileUrl || fileBlob ? handleDownload : undefined}
-          onFileSelect={handleFileSelect}
           onJsonExport={documentData ? handleJsonExport : undefined}
           showJsonExportBtn={!!(onJsonExport || showJsonExport)}
         />
