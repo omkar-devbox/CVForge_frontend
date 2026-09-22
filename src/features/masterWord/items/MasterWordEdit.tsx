@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Sparkles,
   ListPlus,
@@ -6,17 +6,19 @@ import {
   Hash,
   Calendar,
   Settings2,
-  Plus,
   Image as ImageIcon,
   Table as TableIcon,
-  FileText,
   Copy,
   Check,
   Eye,
   Info,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
+import { toast } from "@/shared/ui/toast";
 import type { TemplateRecord } from "../types/masterWord.types";
+import { getTemplateFileUrl } from "../api/masterWordApi";
+import { dynamicFieldsApi } from "../api/dynamicFieldsApi";
 import { DynamicFieldModal, DynamicField, DynamicFieldType } from "./DynamicFieldModal";
 import {
   DocxViewer,
@@ -27,97 +29,16 @@ import {
 interface MasterWordEditProps {
   template: TemplateRecord;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (updated: Partial<TemplateRecord>) => Promise<void> | void;
+  isSaving?: boolean;
 }
 
-const INITIAL_FIELDS: DynamicField[] = [
-  {
-    id: "f_quotation_no",
-    name: "Quotation Number",
-    key: "{{quotation_no}}",
-    type: "text",
-    description: "Official quotation reference number",
-    value: "Q-2026-019-R0",
-    color: "blue",
-  },
-  {
-    id: "f_quotation_date",
-    name: "Quotation Date",
-    key: "{{quotation_date}}",
-    type: "date",
-    description: "Date of quotation release",
-    value: "12.03.2026",
-    color: "amber",
-  },
-  {
-    id: "f_client_attn",
-    name: "Client Attention",
-    key: "{{client_attn}}",
-    type: "text",
-    description: "Name of the client contact person",
-    value: "Mr. Avinash Gonge",
-    color: "purple",
-  },
-  {
-    id: "f_project_title",
-    name: "Project Title",
-    key: "{{project_title}}",
-    type: "text",
-    description: "Name of the conveyor project",
-    value: "Engine conveyor along with engine pallets",
-    color: "emerald",
-  },
-  {
-    id: "f_contact_person",
-    name: "Contact Person",
-    key: "{{contact_person}}",
-    type: "text",
-    description: "Primary representative name",
-    value: "Vijay Shete",
-    color: "indigo",
-  },
-  {
-    id: "f_contact_email",
-    name: "Contact Email",
-    key: "{{contact_email}}",
-    type: "text",
-    description: "Email address for RFQ communications",
-    value: "vijayshete@prologicmechatronics.com",
-    color: "blue",
-  },
-  {
-    id: "f_contact_mobile",
-    name: "Contact Phone",
-    key: "{{contact_phone}}",
-    type: "number",
-    description: "Mobile number for project coordinator",
-    value: "7558222587",
-    color: "orange",
-  },
-  {
-    id: "f_company_logo",
-    name: "Company Logo",
-    key: "{{company_logo}}",
-    type: "image",
-    description: "Header company logo or brand graphic",
-    color: "emerald",
-  },
-  {
-    id: "f_specs_table",
-    name: "RFQ Specifications",
-    key: "{{rfq_specifications}}",
-    type: "table",
-    description: "Equipment and conveyor specification line items",
-    color: "indigo",
-    columns: [
-      { id: "c1", name: "Item", key: "item", type: "text" },
-      { id: "c2", name: "Description", key: "description", type: "text" },
-      { id: "c3", name: "Quantity", key: "qty", type: "text" },
-    ],
-  },
-];
-
-export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClose, onSave }) => {
+export const MasterWordEdit: React.FC<MasterWordEditProps> = ({
+  template,
+  onClose,
+  onSave,
+  isSaving = false,
+}) => {
   const [activeTab, setActiveTab] = useState<"preview" | "overview">("preview");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -129,33 +50,141 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
     }, 2000);
   };
 
-  const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(INITIAL_FIELDS);
+  const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(() => {
+    if (template.variables && template.variables.length > 0) {
+      return template.variables.map((token) => {
+        const cleanName = token
+          .replace(/[{}]/g, "")
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+        return {
+          id: `f_${token.replace(/[^a-zA-Z0-9]/g, "")}`,
+          name: cleanName,
+          key: token,
+          type: "text" as DynamicFieldType,
+          description: "Template variable placeholder",
+          value: "",
+          color: "blue" as const,
+        };
+      });
+    }
+    return [];
+  });
+
+  // Load saved dynamic fields from backend API on mount
+  useEffect(() => {
+    if (template.id) {
+      dynamicFieldsApi
+        .getFieldsByTemplate(template.id)
+        .then((backendFields) => {
+          if (backendFields && backendFields.length > 0) {
+            setDynamicFields(backendFields);
+          }
+        })
+        .catch((err) => {
+          console.debug("Remote dynamic fields lookup:", err);
+        });
+    }
+  }, [template.id]);
+
+  const handleSaveAll = async () => {
+    const varKeys = dynamicFields.map((f) => f.key);
+    try {
+      if (template.id && dynamicFields.length > 0) {
+        await dynamicFieldsApi.bulkSync(template.id, dynamicFields);
+      }
+    } catch (err) {
+      console.debug("Dynamic fields sync error:", err);
+    }
+    await onSave({
+      templateName: template.templateName,
+      description: template.description,
+      category: template.category,
+      version: template.version,
+      status: template.status,
+      variables: varKeys,
+    });
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<DynamicField | null>(null);
-
-  const handleOpenCreateModal = () => {
-    setSelectedField(null);
-    setIsModalOpen(true);
-  };
 
   const handleOpenEditModal = (field: DynamicField) => {
     setSelectedField(field);
     setIsModalOpen(true);
   };
 
-  const handleSaveField = (savedField: DynamicField) => {
+  const handleSaveField = async (savedField: DynamicField) => {
+    const isNew =
+      !savedField.id ||
+      savedField.id.startsWith("field_") ||
+      savedField.id.startsWith("f_");
+
+    // Optimistic state update
     setDynamicFields((prev) => {
-      const exists = prev.some((f) => f.id === savedField.id);
+      const exists = prev.some((f) => f.id === savedField.id || f.key === savedField.key);
       if (exists) {
-        return prev.map((f) => (f.id === savedField.id ? savedField : f));
+        return prev.map((f) => (f.id === savedField.id || f.key === savedField.key ? savedField : f));
       } else {
         return [savedField, ...prev];
       }
     });
+
+    // Persist to backend API
+    try {
+      if (isNew) {
+        const created = await dynamicFieldsApi.createDynamicField({
+          name: savedField.name,
+          key: savedField.key,
+          type: savedField.type === "table" ? "COLUMN" : savedField.type.toUpperCase(),
+          description: savedField.description,
+          templateId: template.id,
+          value: savedField.value,
+          columns: savedField.columns?.map((c) => ({
+            name: c.name,
+            key: c.key,
+            type: (c.type || "text").toUpperCase(),
+          })),
+        });
+        setDynamicFields((prev) =>
+          prev.map((f) => (f.key === savedField.key || f.id === savedField.id ? created : f))
+        );
+        toast.success(`Dynamic field "${created.name}" created!`);
+      } else {
+        const updated = await dynamicFieldsApi.updateDynamicField(savedField.id, {
+          name: savedField.name,
+          key: savedField.key,
+          type: savedField.type === "table" ? "COLUMN" : savedField.type.toUpperCase(),
+          description: savedField.description,
+          value: savedField.value,
+          columns: savedField.columns?.map((c) => ({
+            name: c.name,
+            key: c.key,
+            type: (c.type || "text").toUpperCase(),
+          })),
+        });
+        setDynamicFields((prev) =>
+          prev.map((f) => (f.id === savedField.id ? updated : f))
+        );
+        toast.success(`Dynamic field "${updated.name}" updated!`);
+      }
+    } catch (err: any) {
+      console.error("Failed to persist dynamic field:", err);
+      toast.error(err?.message || "Failed to persist dynamic field to server");
+    }
   };
 
-  const handleDeleteField = (id: string) => {
+  const handleDeleteField = async (id: string) => {
     setDynamicFields((prev) => prev.filter((f) => f.id !== id));
+    if (id && !id.startsWith("field_") && !id.startsWith("f_")) {
+      try {
+        await dynamicFieldsApi.deleteDynamicField(id);
+        toast.success("Dynamic field deleted!");
+      } catch (err: any) {
+        console.error("Failed to delete dynamic field from server:", err);
+        toast.error(err?.message || "Failed to delete dynamic field");
+      }
+    }
   };
 
   // Triggered when user selects text or clicks an image/table in DocxViewer
@@ -409,15 +438,9 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
     }
   };
 
-  // Determine initial document URL based on template
+  // Determine document URL from template or backend API
   const getDocumentUrl = () => {
-    if (template.fileName.includes("Engine dressing conveyor") || template.id === "1") {
-      return "/documents/Q-2026-019-Engine dressing conveyor _R0_Mar_12_26 (1) (1).docx";
-    }
-    if (template.fileName === "sample.docx") {
-      return "/sample.docx";
-    }
-    return `/documents/${template.fileName}`;
+    return getTemplateFileUrl(template.id, template.fileUrl);
   };
 
   return (
@@ -481,10 +504,12 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
 
             <button
               type="button"
-              onClick={onSave}
-              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
             >
-              Save Changes
+              {isSaving && <Loader2 size={13} className="animate-spin" />}
+              <span>{isSaving ? "Saving..." : "Save Changes"}</span>
             </button>
           </div>
         </div>
@@ -604,13 +629,6 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
                 {dynamicFields.length}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={handleOpenCreateModal}
-              className="text-[11px] font-semibold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-600 border border-blue-200 dark:border-blue-800/50 hover:border-transparent px-2 py-1 rounded-md transition-all flex items-center gap-1 shadow-2xs"
-            >
-              <Plus className="w-3 h-3" /> Add Field
-            </button>
           </div>
 
           <div className="space-y-2.5">
@@ -726,23 +744,7 @@ export const MasterWordEdit: React.FC<MasterWordEditProps> = ({ template, onClos
             })}
           </div>
 
-          {/* Add Field Dropzone */}
-          <div className="mt-3">
-            <div
-              onClick={handleOpenCreateModal}
-              className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/60 dark:to-slate-800/30 rounded-xl p-3 border border-slate-200/60 dark:border-slate-700/60 border-dashed text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors group"
-            >
-              <div className="w-6 h-6 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-1.5 shadow-2xs group-hover:scale-110 transition-transform">
-                <Plus className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-500" />
-              </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold">
-                Add Dynamic Field
-              </p>
-              <span className="text-[9px] text-slate-400 block">
-                Text, Image, Date, Number, Table
-              </span>
-            </div>
-          </div>
+
         </div>
       </div>
 

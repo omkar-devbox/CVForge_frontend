@@ -1,5 +1,46 @@
-import { FileText } from "lucide-react";
+import { createElement, forwardRef } from "react";
+import { FileText, type LucideIcon, type LucideProps } from "lucide-react";
 import type { MenuSection, MenuItem } from "@/shared/nav/Sidebar/types/types";
+
+// ==================== Custom O Icon ====================
+
+/**
+ * Custom 'O' icon representing Offer in the sidebar
+ */
+export const O: LucideIcon = forwardRef<SVGSVGElement, LucideProps>(
+  ({ size = 20, className = "", strokeWidth = 2, ...props }, ref) =>
+    createElement(
+      "svg",
+      {
+        ref,
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth,
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        className,
+        ...props,
+      },
+      createElement("circle", { cx: 12, cy: 12, r: 9 }),
+      createElement(
+        "text",
+        {
+          x: 12,
+          y: 16.5,
+          textAnchor: "middle",
+          fontSize: 12,
+          fontWeight: 800,
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          fill: "currentColor",
+          stroke: "none",
+        },
+        "O"
+      )
+    )
+) as unknown as LucideIcon;
 
 // ==================== Sidebar Menu ====================
 
@@ -16,6 +57,14 @@ export const SIDEBAR_MENU: MenuSection[] = [
         icon: FileText,
         path: "/master-word",
         tooltip: "Manage Master Word Templates",
+      },
+      {
+        id: "word-offer",
+        key: "word-offer",
+        label: "Word Offer",
+        icon: O,
+        path: "/word-offer",
+        tooltip: "Manage Word Offer Templates",
       },
     ],
   },

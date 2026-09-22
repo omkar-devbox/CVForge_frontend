@@ -1,44 +1,48 @@
 import React from "react";
 import { DataTable } from "@/shared/ui/dataTable/dataTable";
 import { Button } from "@/shared/ui/button";
-import { Download, Trash2, Edit2, Loader2, FileText } from "lucide-react";
+import { Sparkles, FileText } from "lucide-react";
 import type { ColumnDef } from "@/shared/ui/dataTable/types/dataTable.types";
-import type { TemplateRecord } from "../types/masterWord.types";
+import type { WordOfferRecord } from "../types/wordOffer.types";
 
-interface MasterWordTableProps {
-  data: TemplateRecord[];
+interface WordOfferTableProps {
+  data: WordOfferRecord[];
   isLoading?: boolean;
-  onEdit?: (template: TemplateRecord) => void;
-  onDownload?: (template: TemplateRecord) => void;
-  onDelete?: (template: TemplateRecord) => void;
+  onViewOffer?: (offer: WordOfferRecord) => void;
+  onDownload?: (offer: WordOfferRecord) => void;
   downloadingId?: string | null;
-  deletingId?: string | null;
 }
 
-export const MasterWordTable: React.FC<MasterWordTableProps> = ({
+export const WordOfferTable: React.FC<WordOfferTableProps> = ({
   data,
   isLoading,
-  onEdit,
-  onDownload,
-  onDelete,
-  downloadingId,
-  deletingId,
+  onViewOffer,
 }) => {
-  const columns: ColumnDef<TemplateRecord>[] = [
+  const columns: ColumnDef<WordOfferRecord>[] = [
     {
-      id: "templateName",
-      label: "Template Name",
-      key: "templateName",
+      id: "offerNumber",
+      label: "Quotation Ref",
+      key: "offerNumber",
     },
     {
-      id: "category",
-      label: "Category",
-      key: "category",
+      id: "title",
+      label: "Title",
+      key: "title",
+    },
+    {
+      id: "clientName",
+      label: "Client",
+      key: "clientName",
     },
     {
       id: "status",
       label: "Status",
       key: "status",
+    },
+    {
+      id: "totalAmount",
+      label: "Total Value",
+      key: "totalAmount",
     },
     {
       id: "createdAt",
@@ -47,32 +51,38 @@ export const MasterWordTable: React.FC<MasterWordTableProps> = ({
     },
   ];
 
-  const renderCard = (row: TemplateRecord) => {
-    const getStatusColor = (status: string) => {
-      switch (status) {
-        case "Active Production":
-        case "Published":
-          return "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800";
-        case "Draft":
-          return "bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800";
-        case "Restricted Access":
-        default:
-          return "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700";
-      }
-    };
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Accepted":
+        return "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800";
+      case "Sent":
+        return "bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800";
+      case "Under Review":
+        return "bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800";
+      case "Rejected":
+        return "bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800";
+      case "Draft":
+      default:
+        return "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700";
+    }
+  };
 
-    const isDownloading = downloadingId === row.id;
-    const isDeleting = deletingId === row.id;
 
+  const renderCard = (row: WordOfferRecord) => {
     return (
-      <div className="flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-md transition-all duration-200">
-        {/* Document Illustration Header */}
+      <div
+        className="flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer group"
+        onClick={() => onViewOffer && onViewOffer(row)}
+      >
+        {/* Document Illustration Header - Identical to Master Word */}
         <div className="bg-slate-50 dark:bg-slate-800/50 p-4 pb-0 flex justify-center relative border-b border-slate-100 dark:border-slate-800">
           <div className="flex justify-between items-start absolute top-3 left-3 right-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold">
               <span className="text-blue-600 dark:text-blue-400">.DOCX</span>
               <span className="text-[11px] font-normal text-slate-400 dark:text-slate-500">
-                {row.size}
+                {row.dynamicFieldsCount !== undefined
+                  ? `${row.dynamicFieldsCount} fields`
+                  : `${row.boqItems?.length || 0} items`}
               </span>
             </div>
             <span
@@ -84,6 +94,7 @@ export const MasterWordTable: React.FC<MasterWordTableProps> = ({
             </span>
           </div>
 
+          {/* Miniature Document Graphic matching Master Word */}
           <div className="bg-white dark:bg-slate-950 w-3/4 max-w-[200px] aspect-[1/1.2] mt-6 rounded-t-lg shadow-sm border border-slate-200 dark:border-slate-700 border-b-0 p-4 flex flex-col gap-3">
             <div className="w-full h-2 bg-blue-600/80 rounded-sm"></div>
             <div className="w-3/4 h-2 bg-slate-700/80 rounded-sm"></div>
@@ -97,57 +108,35 @@ export const MasterWordTable: React.FC<MasterWordTableProps> = ({
           </div>
         </div>
 
-        {/* Card Body */}
+        {/* Card Body - Shows Template Name and Description */}
         <div className="p-5 flex flex-col flex-grow">
           <div className="flex items-start justify-between gap-2 mb-1.5">
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base leading-snug line-clamp-1">
-              {row.templateName}
+              {row.templateName || row.title || (row.offerNumber ? `Quotation ${row.offerNumber}` : `Offer ${row.id}`)}
             </h3>
           </div>
 
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-3 line-clamp-2 flex-grow">
-            {row.description || "No description provided for this template."}
+            {row.notes || row.project || row.clientName || ""}
           </p>
 
           <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-4 pt-1">
-            <span className="truncate max-w-[130px]">{row.category}</span>
-            <span>{row.version}</span>
+            <span className="truncate max-w-[130px]">{row.clientName || row.project || row.offerNumber || ""}</span>
+            <span>{row.createdAt || ""}</span>
           </div>
 
-          <div className="flex gap-2 mt-auto pt-3 border-t border-slate-100 dark:border-slate-800">
+          {/* Action Area */}
+          <div
+            className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Button
               variant="primary"
-              className="flex-1 text-xs h-8 gap-1.5"
-              onClick={() => onEdit && onEdit(row)}
+              className="w-full text-xs h-8 gap-1.5"
+              onClick={() => onViewOffer && onViewOffer(row)}
             >
-              <Edit2 size={12} />
-              Edit Template
-            </Button>
-            <Button
-              variant="outline"
-              className="w-8 h-8 p-0 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800"
-              title="Download .docx file"
-              disabled={isDownloading}
-              onClick={() => onDownload && onDownload(row)}
-            >
-              {isDownloading ? (
-                <Loader2 size={13} className="animate-spin text-blue-600" />
-              ) : (
-                <Download size={13} className="text-slate-600 dark:text-slate-300" />
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              className="w-8 h-8 p-0 flex items-center justify-center bg-red-50/60 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 border-red-200 dark:border-red-900"
-              title="Delete template"
-              disabled={isDeleting}
-              onClick={() => onDelete && onDelete(row)}
-            >
-              {isDeleting ? (
-                <Loader2 size={13} className="animate-spin text-red-500" />
-              ) : (
-                <Trash2 size={13} className="text-red-500" />
-              )}
+              <Sparkles size={13} />
+              AI View
             </Button>
           </div>
         </div>
@@ -162,10 +151,10 @@ export const MasterWordTable: React.FC<MasterWordTableProps> = ({
           <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
         </div>
         <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">
-          No templates found
+          No Word Offers Found
         </h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-          No Master Word Templates match your criteria. Click "Add Template" to upload your first .docx template document.
+          No Word Offers match your criteria.
         </p>
       </div>
     );
@@ -177,13 +166,15 @@ export const MasterWordTable: React.FC<MasterWordTableProps> = ({
         data={data}
         columns={columns}
         isLoading={isLoading}
-        enableSearch={true}
+        enableSearch={false}
         layout="card"
         cardOrientation="vertical"
         renderCard={renderCard}
         height="100%"
         hideToolbar={true}
+        pageSize={100}
       />
     </div>
   );
 };
+

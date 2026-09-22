@@ -6,6 +6,7 @@ import { SIDEBAR_MENU } from "../menu/menuItems";
 
 // Lazy loading page components
 const MasterWordPage = lazy(() => import("@/features/masterWord/masterWord"));
+const WordOfferPage = lazy(() => import("@/features/wordOffer/WordOfferPage"));
 const GenericPage = lazy(() => import("@/shared/pages/GenericPage/GenericPage"));
 
 const UnauthorizedPage = lazy(() =>
@@ -82,9 +83,19 @@ export function AppRouter() {
           }
         />
 
+        {/* Word Offer */}
+        <Route
+          path="/word-offer"
+          element={
+            <MainLayout pageTitle="Word Offer" pageSubtitle="Create & manage commercial & technical quotations">
+              <WordOfferPage />
+            </MainLayout>
+          }
+        />
+
         {/* Dynamic Sidebar Module & Settings Routes */}
         {moduleRoutes
-          .filter((route) => route.path !== "/master-word")
+          .filter((route) => route.path !== "/master-word" && route.path !== "/word-offer")
           .map((route) => (
             <Route
               key={route.path}
